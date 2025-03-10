@@ -1,0 +1,28 @@
+---
+title: "Análisis exploratorio de datos"
+author: "Mauricio Vazquez"
+date: '2025-03-14'
+output: pdf_document
+---
+
+***Link del repositorio de GitHub: https://github.com/MauricioVazquezM/Data_Visualization_Course_Project***
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, fig.width=10)
+
+# Libraries
+library(MASS)  
+library(ggplot2)
+library(GGally)
+library(mclust)
+library(kableExtra)
+library(FactoMineR)
+library(knitr)
+library(caret)
+library(dplyr)
+library(gridExtra)
+library(corrplot)
+library(ggcorrplot)
+library(car)
+library(lmtest)
+```
