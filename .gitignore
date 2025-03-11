@@ -5,5 +5,6 @@ DATA/*
 *.pdf
 *.log
 
-# Ignore Rhistory file
+# Ignore Rhistory  and RDat file
 *.Rhistory
+*.RData
