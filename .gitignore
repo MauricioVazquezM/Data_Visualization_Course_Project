@@ -4,3 +4,6 @@ DATA/*
 # Ignore pdf files ang .log files
 *.pdf
 *.log
+
+# Ignore Rhistory file
+*.Rhistory
