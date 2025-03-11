@@ -2,7 +2,9 @@
 title: "Análisis exploratorio de datos"
 author: "Mauricio Vazquez"
 date: '2025-03-14'
-output: pdf_document
+output:
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ***Link del repositorio de GitHub: https://github.com/MauricioVazquezM/Data_Visualization_Course_Project***
@@ -26,3 +28,157 @@ library(ggcorrplot)
 library(car)
 library(lmtest)
 ```
+
+```{r, echo=FALSE}
+# Lectura de los datos
+data <- read.csv("C:\\Users\\mauva\\OneDrive\\Documents\\ITAM\\10mo Semestre\\VISUALIZACION DE LA INFORMACION\\CODIGO\\PROJECT REPOSITORY\\Data_Visualization_Course_Project\\DATA\\ESGData.csv")
+colnames(data) <- colnames(data) %>%
+  tolower() %>%                       
+  gsub("\\.", "_", .) %>%               
+  gsub("^x(\\d{4})$", "\\1", .)   
+# head(data)
+```
+
+<br>
+
+## Objetivo
+
+* El objetivo principal de este analisis explorartio es comprender y visualizar la estructura de los datos para extraer información relevante. Se busca identificar tendencias y patrones en problemas globales, explorar relaciones entre variables clave, y realizar comparaciones entre distintos países y regiones. Además, el análisis permitirá evaluar el impacto de eventos globales en los datos.
+
+<br>
+
+## Primeras observaciones
+
+***Descripción*** 
+
+El dataset seleccionado proviene del Banco Mundial y contiene datos sobre indicadores ambientales, sociales y de gobernanza (ESG) a nivel país y región. Con una estructura de aproximadamente 16000 filas y un total de 67 columnas, permite analizar la evolución de diversas métricas clave desde 1960 hasta 2020. 
+
+***Columnas principales***
+
+- **`Country.Name`**: Nombre del país o región.  
+- **`Country.Code`**: Código de tres letras asignado a cada país.  
+- **`Indicator.Name`**: Nombre del indicador (ej. emisiones de CO₂, acceso a electricidad).  
+- **`Indicator.Code`**: Código asociado al indicador.  
+- **`X1960` – `X2020`**: Valores anuales del indicador correspondiente para cada país.  
+- **`X2050`**: Proyecciones para 2050 (si están disponibles).  
+- **`X`**: Columna vacía (posiblemente residual de la extracción de datos).  
+
+***Variables categóricas*** 
+
+- `Country.Name`, `Country.Code`, `Indicator.Name`, `Indicator.Code`  
+
+***Variables cuantitativas***  
+
+- Columnas de años (`X1960` a `X2020` y `X2050`), que contienen valores cuantitativos de cada indicador.  
+
+***Valores faltantes***
+
+- Algunas variables tienen un número significativo de valores faltantes (`NA`).  
+- En los primeros años (1960-1980), hay muchas celdas sin datos, probablemente porque los indicadores no estaban disponibles para todos los países en ese período.
+
+
+<br>
+
+## Análisis exploratorio de datos
+
+***Análisis univariado de los datos***
+
+<br>
+
+```{r echo=FALSE}
+# Funcion de analisis univariado
+univar_analisis <- function(data) {
+  results <- list()
+  
+  for (feature in colnames(data)) {
+    data_type <- class(data[[feature]])[1]
+    
+    total <- nrow(data)
+    nan_count <- sum(is.na(data[[feature]]))
+    no_missings <- total - nan_count
+    pct_missings <- nan_count / total
+    
+    if (is.numeric(data[[feature]])) {
+      promedio <- round(mean(data[[feature]], na.rm = TRUE),2)
+      desv_estandar <- round(sd(data[[feature]], na.rm = TRUE),2)
+      varianza <- round(var(data[[feature]], na.rm = TRUE),2)
+      minimo <- min(data[[feature]], na.rm = TRUE)
+      p10 <- quantile(data[[feature]], 0.10, na.rm = TRUE)
+      q1 <- quantile(data[[feature]], 0.25, na.rm = TRUE)
+      mediana <- quantile(data[[feature]], 0.50, na.rm = TRUE)
+      q3 <- quantile(data[[feature]], 0.75, na.rm = TRUE)
+      p90 <- quantile(data[[feature]], 0.90, na.rm = TRUE)
+      maximo <- max(data[[feature]], na.rm = TRUE)
+      
+      inf_count <- sum(is.infinite(data[[feature]]) & data[[feature]] > 0)
+      neg_inf_count <- sum(is.infinite(data[[feature]]) & data[[feature]] < 0)
+    } else {
+      promedio <- NA
+      desv_estandar <- NA
+      varianza <- NA
+      minimo <- NA
+      p10 <- NA
+      q1 <- NA
+      mediana <- NA
+      q3 <- NA
+      p90 <- NA
+      maximo <- NA
+    }
+    
+    results[[length(results) + 1]] <- list(
+      
+      Variable = feature,
+      Total = total,
+      No_Missings = no_missings,
+      Missings = nan_count,
+      Pct_Missings = pct_missings,
+      Promedio = promedio,
+      Desv_Std = desv_estandar,
+      Varianza = varianza,
+      Minimo = minimo,
+      p10 = p10,
+      q1 = q1,
+      Mediana = mediana,
+      q3 = q3,
+      p90 = p90,
+      Maximo = maximo
+    )
+  }
+  
+  result_df <- do.call(rbind, lapply(results, as.data.frame))
+  
+  rownames(result_df) <- NULL
+  
+  return(result_df)
+  
+}
+
+# Seleccionar las columnas para el análisis
+cols_to_analyze <- c("country_name", "country_code", "indicator_name", "indicator_code",
+                     "1960", "1970", "1980", "1990", "2000", "2010", "2020")
+
+# Filtrar solo las columnas relevantes
+data_filtered <- data[, cols_to_analyze, drop = FALSE]
+
+# Aplicar la función de análisis univariado
+resultados <- univar_analisis(data_filtered)
+
+# Separar el análisis en dos partes
+resultados_parte1 <- resultados[, c("Variable", "Total", "No_Missings", "Missings", "Pct_Missings", "Promedio", "Desv_Std", "Varianza")]
+
+resultados_parte2 <- resultados[, c("Minimo", "p10", "q1", "Mediana", "q3", "p90", "Maximo")]
+
+# Mostrar los resultados en dos tablas separadas por margenes de pagina
+resultados_parte1 %>%
+  kable(caption = "Análisis univariado de los datos - Parte I", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+resultados_parte2 %>%
+  kable(caption = "Análisis univariado de los datos - Parte II", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+```
+
+<br>
+
+***Visualización de las variables***
