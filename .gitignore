@@ -1,2 +1,3 @@
 # Ignore all files on DATA directory
 DATA/*
+.pdf
