@@ -1,3 +1,6 @@
 # Ignore all files on DATA directory
 DATA/*
-.pdf
+
+# Ignore pdf files ang .log files
+*.pdf
+*.log
