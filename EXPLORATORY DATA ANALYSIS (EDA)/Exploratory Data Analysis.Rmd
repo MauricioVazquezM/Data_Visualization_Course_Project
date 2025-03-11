@@ -63,20 +63,6 @@ El dataset seleccionado proviene del Banco Mundial y contiene datos sobre indica
 - **`X2050`**: Proyecciones para 2050 (si están disponibles).  
 - **`X`**: Columna vacía (posiblemente residual de la extracción de datos).  
 
-***Variables categóricas*** 
-
-- `Country.Name`, `Country.Code`, `Indicator.Name`, `Indicator.Code`  
-
-***Variables cuantitativas***  
-
-- Columnas de años (`X1960` a `X2020` y `X2050`), que contienen valores cuantitativos de cada indicador.  
-
-***Valores faltantes***
-
-- Algunas variables tienen un número significativo de valores faltantes (`NA`).  
-- En los primeros años (1960-1980), hay muchas celdas sin datos, probablemente porque los indicadores no estaban disponibles para todos los países en ese período.
-
-
 <br>
 
 ## Análisis exploratorio de datos
@@ -164,20 +150,28 @@ data_filtered <- data[, cols_to_analyze, drop = FALSE]
 resultados <- univar_analisis(data_filtered)
 
 # Separar el análisis en dos partes
-resultados_parte1 <- resultados[, c("Variable", "Total", "No_Missings", "Missings", "Pct_Missings", "Promedio", "Desv_Std", "Varianza")]
+resultados_parte1 <- resultados[, c("Variable", "Total", "No_Missings", "Missings", "Pct_Missings")]
 
-resultados_parte2 <- resultados[, c("Minimo", "p10", "q1", "Mediana", "q3", "p90", "Maximo")]
+# resultados_parte2 <- resultados[, c("Minimo", "p10", "q1", "Mediana", "q3", "p90", "Maximo")]
 
 # Mostrar los resultados en dos tablas separadas por margenes de pagina
 resultados_parte1 %>%
-  kable(caption = "Análisis univariado de los datos - Parte I", booktabs = TRUE) %>%
+  kable(caption = "Análisis de valores nulos", booktabs = TRUE) %>%
   kable_styling(latex_options = c("striped", "hold_position"))
-
-resultados_parte2 %>%
-  kable(caption = "Análisis univariado de los datos - Parte II", booktabs = TRUE) %>%
-  kable_styling(latex_options = c("striped", "hold_position"))
-
 ```
+
+***Variables categóricas*** 
+
+- `Country.Name`, `Country.Code`, `Indicator.Name`, `Indicator.Code`  
+
+***Variables cuantitativas***  
+
+- Columnas de años (`X1960` a `X2020` y `X2050`), que contienen valores cuantitativos de cada indicador.  
+
+***Valores faltantes***
+
+- Algunas variables tienen un número significativo de valores faltantes (`NA`).  
+- En los primeros años (1960-1980), hay muchas celdas sin datos, probablemente porque los indicadores no estaban disponibles para todos los países en ese período.
 
 <br>
 
