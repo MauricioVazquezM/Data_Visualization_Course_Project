@@ -76,11 +76,15 @@ tabla_columnas %>%
   kable(format = "latex", booktabs = TRUE, caption = "Descripción de las columnas del dataset") %>%
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
+
+***Variables categóricas*** 
+ 
+ - `Country.Name`, `Country.Code`, `Indicator.Name`, `Indicator.Code`  
+ 
+ ***Variables cuantitativas***  
+ 
+ - Columnas de años (`X1960` a `X2020` y `X2050`), que contienen valores cuantitativos de cada indicador.  
   
-<br>
-
-\newpage
-
 ## Análisis exploratorio de datos
 
 ***Análisis univariado de los datos***
