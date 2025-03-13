@@ -53,17 +53,33 @@ colnames(data) <- colnames(data) %>%
 
 El dataset seleccionado proviene del Banco Mundial y contiene datos sobre indicadores ambientales, sociales y de gobernanza (ESG) a nivel país y región. Con una estructura de aproximadamente 16000 filas y un total de 67 columnas, permite analizar la evolución de diversas métricas clave desde 1960 hasta 2020. 
 
+<br>
+
 ***Columnas principales***
 
-- **`Country.Name`**: Nombre del país o región.  
-- **`Country.Code`**: Código de tres letras asignado a cada país.  
-- **`Indicator.Name`**: Nombre del indicador (ej. emisiones de CO₂, acceso a electricidad).  
-- **`Indicator.Code`**: Código asociado al indicador.  
-- **`X1960` – `X2020`**: Valores anuales del indicador correspondiente para cada país.  
-- **`X2050`**: Proyecciones para 2050 (si están disponibles).  
-- **`X`**: Columna vacía (posiblemente residual de la extracción de datos).  
+```{r echo=FALSE}
+# Descripcion columnas principales
+tabla_columnas <- data.frame(
+  Variable = c("Country.Name", "Country.Code", "Indicator.Name", "Indicator.Code",
+               "X1960 – X2020", "X2050", "X"),
+  Descripción = c("Nombre del país o región",
+                  "Código de tres letras asignado a cada país",
+                  "Nombre del indicador (ej. emisiones de CO₂, acceso a electricidad)",
+                  "Código asociado al indicador",
+                  "Valores anuales del indicador correspondiente para cada país",
+                  "Proyecciones para 2050 (si están disponibles)",
+                  "Columna vacía (posiblemente residual de la extracción de datos)")
+)
 
+# Tabla descripcion
+tabla_columnas %>%
+  kable(format = "latex", booktabs = TRUE, caption = "Descripción de las columnas del dataset") %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+  
 <br>
+
+\newpage
 
 ## Análisis exploratorio de datos
 
@@ -160,18 +176,7 @@ resultados_parte1 %>%
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
 
-***Variables categóricas*** 
-
-- `Country.Name`, `Country.Code`, `Indicator.Name`, `Indicator.Code`  
-
-***Variables cuantitativas***  
-
-- Columnas de años (`X1960` a `X2020` y `X2050`), que contienen valores cuantitativos de cada indicador.  
-
-***Valores faltantes***
-
-- Algunas variables tienen un número significativo de valores faltantes (`NA`).  
-- En los primeros años (1960-1980), hay muchas celdas sin datos, probablemente porque los indicadores no estaban disponibles para todos los países en ese período.
+- El análisis de valores nulos muestra que las variables categóricas no presentan valores nulos, mientras que las variables numéricas (años) tienen una alta proporción de valores nulos. Especialmente, en los años 1960 (91.55%) y 2020 (97.10%). A medida que avanzan los años, la disponibilidad de datos mejora, con una reducción gradual de valores nulos, destacando que desde el 2000 los datos son estan mas completos. Esto nos indica que muchos indicadores comenzaron a ser medidos en décadas recientes. 
 
 <br>
 
