@@ -27,6 +27,7 @@ library(corrplot)
 library(ggcorrplot)
 library(car)
 library(lmtest)
+library(tidyr)
 ```
 
 ```{r, echo=FALSE}
@@ -57,7 +58,7 @@ El dataset seleccionado proviene del Banco Mundial y contiene datos sobre indica
 
 ***Columnas principales***
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 # Descripcion columnas principales
 tabla_columnas <- data.frame(
   Variable = c("Country.Name", "Country.Code", "Indicator.Name", "Indicator.Code",
@@ -91,7 +92,7 @@ tabla_columnas %>%
 
 <br>
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 # Funcion de analisis univariado
 univar_analisis <- function(data) {
   results <- list()
@@ -185,3 +186,71 @@ resultados_parte1 %>%
 <br>
 
 ***Visualización de las variables***
+
+Primero, debemos preguntarnos: ¿cuáles son los indicadores con mayor cantidad de valores nulos y, por lo tanto, no aportan datos útiles para generar _insights_ más adelante?
+
+```{r echo=FALSE, fig.align="center", fig.width=12, fig.height=6,, warning=FALSE}
+# Contar los valores nulos por indicador
+missing_values <- data %>%
+  group_by(indicator_name) %>%
+  summarise(Valores_Nulos = sum(is.na(across(where(is.numeric))))) %>%
+  arrange(desc(Valores_Nulos)) %>%
+  head(15)  
+
+# Generar la visualización
+ggplot(missing_values, aes(x = reorder(indicator_name, Valores_Nulos), y = Valores_Nulos, fill = Valores_Nulos)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +  
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Top 15 indicadores con mas valores nulos",
+    subtitle = "Número total de valores nulos",
+    x = "Indicador",
+    y = "Cantidad de valores nulos",
+    caption = "Fuente: Base de datos ESG"
+  ) +
+  theme(
+    panel.grid.major = element_line(color = "gray90"),
+    panel.grid.minor = element_blank()
+  )
+```
+
+
+Con el fin de ilustrar un indicador, comenzaremos explorando el indicador _Access to electricity (% of population)_. Para el cual tenemos la siguiente visualizacion: 
+
+```{r echo=FALSE, fig.align="center", warning=FALSE}
+# Paises sleccionados aleatoriamente
+selected_countries <- c("Iceland", "Japan", "Haiti", "Germany", "Ethiopia", 
+                        "Cuba", "Kuwait", "New Zealand", "Norway", "Panama")
+
+# Filtrar los paises en la data
+data_long <- data %>%
+  filter(indicator_name == "Access to electricity (% of population)",
+         country_name %in% selected_countries) %>%
+  pivot_longer(cols = c("1980", "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020"), 
+               names_to = "Año", values_to = "Valor") %>%
+  mutate(Año = as.numeric(Año))
+
+# Gráfico de evolución del acceso a la electricidad
+ggplot(data_long, aes(x = Año, y = Valor, group = country_name, color = country_name)) +
+  geom_line(size = 1) +  
+  geom_point(size = 2) + 
+  theme_minimal(base_size = 14) +  
+  scale_x_continuous(breaks = c(1990, 1995, 2000, 2005, 2010, 2015)) +
+  labs(
+    title = "Tendencia del Acceso a Electricidad (% de población)",
+    subtitle = "Evolución en los 10 países con mayor acceso al 2020",
+    x = "Año",
+    y = "Pct de población con acceso",
+    color = "País",  
+    caption = "Fuente: Base de datos ESG"
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(size = 10), 
+    panel.grid.major = element_line(color = "gray90"),
+    panel.grid.minor = element_blank() 
+  )
+```
+
+
