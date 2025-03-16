@@ -1,6 +1,6 @@
 ---
 title: "Análisis exploratorio de datos"
-author: "Mauricio Vazquez"
+author: "Equipo 5"
 date: '2025-03-14'
 output:
   pdf_document:
@@ -45,7 +45,7 @@ colnames(data) <- colnames(data) %>%
 
 ## Objetivo
 
-* El objetivo principal de este analisis explorartio es comprender y visualizar la estructura de los datos para extraer información relevante. Se busca identificar tendencias y patrones en problemas globales, explorar relaciones entre variables clave, y realizar comparaciones entre distintos países y regiones. Además, el análisis permitirá evaluar el impacto de eventos globales en los datos.
+* El objetivo de este EDA es comprender la estructura del conjunto de datos, evaluar la cantidad de valores nulos e identificar patrones en su distribución. Además, se busca ilustrar un indicador de interés que servirá como referencia para etapas futuras del proyecto. Este análisis preliminar permitirá detectar posibles limitaciones en la calidad de los datos y sentará las bases para una exploración más profunda y fundamentada en fases posteriores.
 
 <br>
 
@@ -182,32 +182,36 @@ resultados_parte1 %>%
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
 
-- El análisis de valores nulos muestra que las variables categóricas no presentan valores nulos, mientras que las variables numéricas (años) tienen una alta proporción de valores nulos. Especialmente, en los años 1960 (91.55%) y 2020 (97.10%). A medida que avanzan los años, la disponibilidad de datos mejora, con una reducción gradual de valores nulos, destacando que desde el 2000 los datos son estan mas completos. Esto nos indica que muchos indicadores comenzaron a ser medidos en décadas recientes. 
+- El análisis de valores nulos muestra que las variables categóricas no presentan valores nulos, mientras que las variables numéricas (años) tienen una alta proporción de valores nulos. Especialmente, en los años 1960 (91.55%) y 2020 (97.10%). A medida que avanzan los años, la disponibilidad de datos mejora, con una reducción gradual de valores nulos, destacando que desde el 2000 los datos estan mas completos. Esto nos indica que muchos indicadores comenzaron a ser medidos en décadas recientes. 
 
 <br>
 
-***Visualización de las variables***
+***Indicadores con mas valores nulos***
 
 Primero, debemos preguntarnos: ¿cuáles son los indicadores con mayor cantidad de valores nulos y, por lo tanto, no aportan datos útiles para generar _insights_ más adelante?
 
-```{r echo=FALSE, fig.align="center", fig.width=12, fig.height=6,, warning=FALSE}
-# Contar los valores nulos por indicador
+```{r echo=FALSE, fig.align="center", fig.width=14, fig.height=6,message=FALSE, warning=FALSE}
+# Contar los valores nulos por indicador en porcentaje
 missing_values <- data %>%
   group_by(indicator_name) %>%
-  summarise(Valores_Nulos = sum(is.na(across(where(is.numeric))))) %>%
-  arrange(desc(Valores_Nulos)) %>%
+  summarise(
+    Total_Valores = n() * ncol(select(., where(is.numeric))),  
+    Valores_Nulos = sum(is.na(across(where(is.numeric)))),  
+    Pct_Nulos = (Valores_Nulos / Total_Valores) * 100 
+  ) %>%
+  arrange(desc(Pct_Nulos)) %>%
   head(15)  
 
-# Generar la visualización
-ggplot(missing_values, aes(x = reorder(indicator_name, Valores_Nulos), y = Valores_Nulos, fill = Valores_Nulos)) +
+# Generar la visualización con porcentaje de nulos
+ggplot(missing_values, aes(x = reorder(indicator_name, Pct_Nulos), y = Pct_Nulos, fill = Pct_Nulos)) +
   geom_col(show.legend = FALSE) +
   coord_flip() +  
   theme_minimal(base_size = 14) +
+  scale_y_continuous(labels = scales::label_percent(scale = 1)) + 
   labs(
     title = "Top 15 indicadores con mas valores nulos",
-    subtitle = "Número total de valores nulos",
     x = "Indicador",
-    y = "Cantidad de valores nulos",
+    y = "Porcentaje de valores nulos",
     caption = "Fuente: Base de datos ESG"
   ) +
   theme(
@@ -216,7 +220,10 @@ ggplot(missing_values, aes(x = reorder(indicator_name, Valores_Nulos), y = Valor
   )
 ```
 
-- Como observamos se resalta la importancia de manejar adecuadamente los valores nulos en la base de datos. Los indicadores más afectados se relacionan con cambio climático, economía, biodiversidad y sociodemograficos. Esto indica dificultades en la recopilación de datos en estas áreas de investigación Por lo tanto, para futuras fases del proyecto se vana seleccionar los indicadores de interes a estudiar y que contengan mas datos para su manejo optimo y no meter un sesgo innecesario por imputación de valores.
+- Como observamos se resalta la importancia de manejar adecuadamente los valores nulos en la base de datos. Los indicadores más afectados se relacionan con cambio climático, economía, biodiversidad y sociodemograficos. Esto indica dificultades en la recopilación de datos en estas áreas de investigación. Por lo tanto, para futuras fases del proyecto se van a seleccionar los indicadores de interes a estudiar y que contengan mas datos para su manejo optimo y no meter un sesgo innecesario por imputación de valores.
+
+
+***Ilustrando un indicador***
 
 - Ahora, con el fin de ilustrar un indicador, vamos a explorar, de manera superficial, el indicador _Access to electricity (% of population)_. Para el cual tenemos la siguiente visualizacion: 
 
@@ -245,29 +252,26 @@ filtered_countries <- data %>%
          !country_name %in% non_countries) %>%
   filter(!if_any(c("1980", "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020"), is.na)) 
 
-# Seleccionar hasta 10 países aleatorios sin valores nulos
-selected_countries <- filtered_countries %>%
-  sample_n(min(n(), 10)) %>%  # Evita error si hay menos de 10 países
-  pull(country_name)
+# Seleccionar hasta 10 países
+selected_countries <- c("Australia", "Uganda", "India", "Belize")
 
 # Filtrar y transformar los datos
 data_long <- data %>%
   filter(indicator_name == "Access to electricity (% of population)", country_name %in% selected_countries) %>%
-  pivot_longer(cols = c("1980", "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020"), names_to = "Año", values_to = "Valor") %>%
-  mutate(Año = as.numeric(Año)) 
+  pivot_longer(cols = c("1980", "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020"), names_to = "Anho", values_to = "Valor") %>%
+  mutate(Anho = as.numeric(Anho)) 
 
 # Gráfico de evolución del acceso a la electricidad
-ggplot(data_long, aes(x = Año, y = Valor, group = country_name, color = country_name)) +
+ggplot(data_long, aes(x = Anho, y = Valor, group = country_name, color = country_name)) +
   geom_line(size = 1) +  
   geom_point(size = 2) + 
   theme_minimal(base_size = 14) +  
   scale_x_continuous(breaks = c(1990, 1995, 2000, 2005, 2010, 2015)) +
   labs(
-    title = "Tendencia del Acceso a Electricidad (% de población)",
-    subtitle = "Seleccuión de 10 paises aleatorios",
-    x = "Año",
-    y = "Pct de población con acceso",
-    color = "País",  
+    title = "Tendencia del acceso a electricidad (% de poblacion)",
+    x = "Anho",
+    y = "Pct de poblacion con acceso",
+    color = "Pais",  
     caption = "Fuente: Base de datos ESG"
   ) +
   theme(
@@ -277,5 +281,10 @@ ggplot(data_long, aes(x = Año, y = Valor, group = country_name, color = country
     panel.grid.minor = element_blank() 
   )
 ```
+- La visualización presenta la serie de tiempo del porcentaje de acceso a la electricidad en un conjunto de países seleccionados aleatoriamente. El objetivo es ilustrar el comportamiento de este indicador. No obstante, fue necesario realizar múltiples iteraciones para encontrar países con datos disponibles, debido a la gran cantidad de valores nulos en el conjunto de datos. Esto resalta la importancia de una limpieza previa de los datos, permitiendo así explorar y analizar de manera más efectiva los indicadores de interés con mayor cobertura de información.
 
+## Conclusión
 
+- El EDA ha permitido identificar aspectos clave que requieren atención antes de continuar con las siguientes etapas del proyecto. En primer lugar, es necesario reestructurar el conjunto de datos para facilitar su análisis y manejo. También se debe focalizar el estudio en los indicadores más relevantes, priorizando aquellos con mayor cobertura de información para garantizar resultados más sólidos.
+
+- Por otro lado, se debe realizar una limpieza en la variable de países, asegurando que solo se incluyan naciones y excluyendo zonas geográficas o agrupaciones regionales que podrían distorsionar los análisis. A pesar de estos desafíos, el dataset presenta un alto potencial para un análisis social y económico profundo, ya que contiene indicadores clave que pueden ofrecer información valiosa sobre tendencias globales y diferencias entre países.
