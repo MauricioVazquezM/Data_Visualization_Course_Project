@@ -8,3 +8,6 @@ DATA/*
 # Ignore Rhistory  and RDat file
 *.Rhistory
 *.RData
+
+# Ignore .pyc
+*.pyc
