@@ -1,0 +1,36 @@
+---
+title: "Gráficas avanzadas"
+author: "Equipo 5"
+date: '2025-04-22'
+output: html_document
+---
+
+***Link del repositorio de GitHub: https://github.com/MauricioVazquezM/Data_Visualization_Course_Project***
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, fig.width=10)
+
+# Libraries
+library(MASS)  
+library(ggplot2)
+library(GGally)
+library(mclust)
+library(kableExtra)
+library(FactoMineR)
+library(knitr)
+library(caret)
+library(dplyr)
+library(gridExtra)
+library(corrplot)
+library(ggcorrplot)
+library(car)
+library(lmtest)
+library(tidyr)
+library(scales)
+```
+
+```{r, echo=FALSE}
+# Lectura de los datos
+data <- read.csv("C:\\Users\\mauva\\OneDrive\\Documents\\ITAM\\10mo Semestre\\VISUALIZACION DE LA INFORMACION\\CODIGO\\PROJECT REPOSITORY\\Data_Visualization_Course_Project\\DATA\\ESGData_transformed.csv")
+head(data)
+```
