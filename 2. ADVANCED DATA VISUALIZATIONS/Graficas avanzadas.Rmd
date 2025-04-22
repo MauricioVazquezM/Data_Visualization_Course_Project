@@ -109,6 +109,34 @@ ggplot(mapa_datos) +
 
 ###  "Population ages 65 and above (% of total population)"
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.align="center",message=FALSE, warning=FALSE}
+# Filtrar al año 2013 para el indicador
+poblacion_65_2013 <- data %>%
+  filter(year == 2013,
+         indicator_name == "Population ages 65 and above (% of total population)") %>%
+  select(country_name, country_code, value)
 
+# Cargar mapa mundial
+mapa_mundo <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Unir datos con el mapa
+mapa_datos <- mapa_mundo %>%
+  left_join(poblacion_65_2013, by = c("iso_a3" = "country_code"))
+
+# Mapa georreferenciado
+ggplot(mapa_datos) +
+  geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
+  scale_fill_viridis_c(option = "cividis", na.value = "lightgray",
+                       name = "% poblacion 65+") +
+  theme_minimal() +
+  labs(
+    title = "Poblacion de 65 anhos o mas (% del total, 2013)",
+    subtitle = "Porcentaje de adultos mayores por pais",
+    caption = "Fuente: World Bank"
+  ) +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 14, face = "bold"),
+    legend.position = "right"
+  )
 ```
