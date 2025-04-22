@@ -42,7 +42,7 @@ data <- read.csv("C:\\Users\\mauva\\OneDrive\\Documents\\ITAM\\10mo Semestre\\VI
 #head(data)
 ```
 
-En este proyecto nos enfocaremos en el desarrollo de una interfaz gráfica interactiva que permita a los usuarios visualizar mapas georreferenciados de diversos indicadores socioeconómicos y ambientales proporcionados por el Banco Mundial a lo largo del tiempo. Esta herramienta busca facilitar la exploración visual de patrones regionales y temporales en indicadores clave, tales como tasa de fertilidad, emisiones de CO2, acceso a educación, entre otros.
+En este proyecto, nos enfocaremos en el desarrollo de una interfaz gráfica interactiva que permita a los usuarios visualizar mapas georreferenciados de diversos indicadores socioeconómicos y ambientales proporcionados por el Banco Mundial a lo largo del tiempo. Esta herramienta busca facilitar la exploración visual de patrones regionales y temporales en indicadores clave, tales como tasa de fertilidad, emisiones de CO2, acceso a educación, entre otros.
 
 Para asegurar que la información presentada sea útil, relevante y precisa, se implementarán varios procesos de limpieza y transformación de datos. Entre estos procesos se incluyen:
 
@@ -54,7 +54,7 @@ Para asegurar que la información presentada sea útil, relevante y precisa, se 
 
 4. La estandarización de nombres y códigos de países para asegurar una correcta integración con datos geoespaciales.
 
-### Recordando indicadores con menor cantidad de nulos
+### Recordando indicadores con menor cantidad de nulos...
 
 ```{r, echo=FALSE}
 # Calcular cantidad de NA por indicador
@@ -75,6 +75,10 @@ knitr::kable(top5_completos, digits = 2, caption = "Indicadores con menor cantid
     position = "center", bootstrap_options = c("striped", "hover"))
 ```
 _Para este ejercicio en particular, crearemos dos visualizaciones georeferenciadas para los indicadores de "Fertility rate, total (births per woman)" y "Population ages 65 and above (% of total population)" con el fin de ilustrar bocetos, no interactivos aun, de las visualizaciones que se pretenden hacer._
+
+\newpage
+
+---
 
 ### "Fertility rate, total (births per woman)"
 
@@ -107,7 +111,7 @@ ggplot(mapa_datos) +
   )
 ```
 
-<br>
+---
 
 ###  "Population ages 65 and above (% of total population)"
 
