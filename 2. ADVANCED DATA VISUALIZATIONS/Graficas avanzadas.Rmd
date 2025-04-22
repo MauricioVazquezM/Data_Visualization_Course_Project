@@ -42,7 +42,19 @@ data <- read.csv("C:\\Users\\mauva\\OneDrive\\Documents\\ITAM\\10mo Semestre\\VI
 #head(data)
 ```
 
-### Recordando los indicadores con menor cantidad de nulos
+En este proyecto nos enfocaremos en el desarrollo de una interfaz gráfica interactiva que permita a los usuarios visualizar mapas georreferenciados de diversos indicadores socioeconómicos y ambientales proporcionados por el Banco Mundial a lo largo del tiempo. Esta herramienta busca facilitar la exploración visual de patrones regionales y temporales en indicadores clave, tales como tasa de fertilidad, emisiones de CO2, acceso a educación, entre otros.
+
+Para asegurar que la información presentada sea útil, relevante y precisa, se implementarán varios procesos de limpieza y transformación de datos. Entre estos procesos se incluyen:
+
+1. La reorganización estructural del conjunto de datos original del World Bank, el cual se presenta en formato ancho, a un formato largo y analíticamente más útil.
+
+2. La filtración de entidades geográficas que no corresponden a países soberanos (por ejemplo, regiones, clasificaciones de ingreso, agrupaciones económicas), manteniendo únicamente datos de países.
+
+3. El cálculo de completitud por indicador para identificar aquellos con mayor cobertura temporal y espacial, priorizando su inclusión en la interfaz.
+
+4. La estandarización de nombres y códigos de países para asegurar una correcta integración con datos geoespaciales.
+
+### Recordando indicadores con menor cantidad de nulos
 
 ```{r, echo=FALSE}
 # Calcular cantidad de NA por indicador
@@ -58,22 +70,10 @@ top5_completos <- na_por_indicador %>%
   slice_head(n = 5)
 
 # Mostrar en tabla estetica
-knitr::kable(top5_completos, digits = 2, caption = "Indicadores con menor cantidad de valores nulos") %>%
+knitr::kable(top5_completos, digits = 2, caption = "Indicadores con menor cantidad de nulos") %>%
   kableExtra::kable_styling(full_width = FALSE,
     position = "center", bootstrap_options = c("striped", "hover"))
 ```
-En este proyecto nos enfocaremos en el desarrollo de una interfaz gráfica interactiva que permita a los usuarios visualizar mapas georreferenciados de diversos indicadores socioeconómicos y ambientales proporcionados por el Banco Mundial a lo largo del tiempo. Esta herramienta busca facilitar la exploración visual de patrones regionales y temporales en indicadores clave, tales como tasa de fertilidad, emisiones de CO2, acceso a educación, entre otros.
-
-Para asegurar que la información presentada sea útil, relevante y precisa, se implementarán varios procesos de limpieza y transformación de datos. Entre estos procesos se incluyen:
-
-1. La reorganización estructural del conjunto de datos original del World Bank, el cual se presenta en formato ancho, a un formato largo y analíticamente más útil.
-
-2. La filtración de entidades geográficas que no corresponden a países soberanos (por ejemplo, regiones, clasificaciones de ingreso, agrupaciones económicas), manteniendo únicamente datos de países.
-
-3. El cálculo de completitud por indicador para identificar aquellos con mayor cobertura temporal y espacial, priorizando su inclusión en la interfaz.
-
-4. La estandarización de nombres y códigos de países para asegurar una correcta integración con datos geoespaciales.
-
 _Para este ejercicio en particular, crearemos dos visualizaciones georeferenciadas para los indicadores de "Fertility rate, total (births per woman)" y "Population ages 65 and above (% of total population)" con el fin de ilustrar bocetos, no interactivos aun, de las visualizaciones que se pretenden hacer._
 
 ### "Fertility rate, total (births per woman)"
