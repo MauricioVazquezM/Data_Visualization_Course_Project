@@ -29,6 +29,11 @@ library(car)
 library(lmtest)
 library(tidyr)
 library(scales)
+library(tidyverse)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(ggthemes)
 ```
 
 ```{r, echo=FALSE}
@@ -50,18 +55,56 @@ na_por_indicador <- data %>%
 
 # Seleccionar los 5 con menos nulos
 top5_completos <- na_por_indicador %>%
-  slice_head(n = 10)
+  slice_head(n = 5)
 
 # Mostrar en tabla estetica
 knitr::kable(top5_completos, digits = 2, caption = "Indicadores con menor cantidad de valores nulos") %>%
-  kableExtra::kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+  kableExtra::kable_styling(full_width = FALSE,
+    position = "center", bootstrap_options = c("striped", "hover"))
 ```
-- Para este ejercicio, crearemos dos visualizaciones georeferenciadas para los indicadores de "Fertility rate, total (births per woman)" y "Population ages 65 and above (% of total population)".
+En este proyecto nos enfocaremos en el desarrollo de una interfaz gráfica interactiva que permita a los usuarios visualizar mapas georreferenciados de diversos indicadores socioeconómicos y ambientales proporcionados por el Banco Mundial a lo largo del tiempo. Esta herramienta busca facilitar la exploración visual de patrones regionales y temporales en indicadores clave, tales como tasa de fertilidad, emisiones de CO2, acceso a educación, entre otros.
+
+Para asegurar que la información presentada sea útil, relevante y precisa, se implementarán varios procesos de limpieza y transformación de datos. Entre estos procesos se incluyen:
+
+1. La reorganización estructural del conjunto de datos original del World Bank, el cual se presenta en formato ancho, a un formato largo y analíticamente más útil.
+
+2. La filtración de entidades geográficas que no corresponden a países soberanos (por ejemplo, regiones, clasificaciones de ingreso, agrupaciones económicas), manteniendo únicamente datos de países.
+
+3. El cálculo de completitud por indicador para identificar aquellos con mayor cobertura temporal y espacial, priorizando su inclusión en la interfaz.
+
+4. La estandarización de nombres y códigos de países para asegurar una correcta integración con datos geoespaciales.
+
+_Para este ejercicio en particular, crearemos dos visualizaciones georeferenciadas para los indicadores de "Fertility rate, total (births per woman)" y "Population ages 65 and above (% of total population)" con el fin de ilustrar bocetos, no interactivos aun, de las visualizaciones que se pretenden hacer._
 
 ### "Fertility rate, total (births per woman)"
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.align="center",message=FALSE, warning=FALSE}
+# Filtrar al año 2010
+fertilidad_2010 <- data %>%
+  filter(year == 2010,
+         indicator_name == "Fertility rate, total (births per woman)") %>%
+  select(country_name, country_code, value)
 
+# Cargar mapa mundial
+mapa_mundo <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Join
+mapa_datos <- mapa_mundo %>%
+  left_join(fertilidad_2010, by = c("iso_a3" = "country_code"))
+
+# Plor georeferenciado
+ggplot(mapa_datos) +
+  geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
+  scale_fill_viridis_c(option = "viridis", na.value = "lightgray", name = "Tasa de fertilidad") +
+  theme_minimal() +  # Usamos minimal para más control que theme_map
+  labs(title = "Tasa de fertilidad por pais (2010)",
+       subtitle = "Nacimientos por mujer",
+       caption = "Fuente: World Bank") +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 14, face = "bold"),
+    legend.position = "right"
+  )
 ```
 
 ###  "Population ages 65 and above (% of total population)"
