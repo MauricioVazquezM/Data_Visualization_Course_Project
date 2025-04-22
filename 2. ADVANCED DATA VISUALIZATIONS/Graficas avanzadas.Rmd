@@ -107,6 +107,8 @@ ggplot(mapa_datos) +
   )
 ```
 
+<br>
+
 ###  "Population ages 65 and above (% of total population)"
 
 ```{r, echo=FALSE, fig.align="center",message=FALSE, warning=FALSE}
@@ -126,7 +128,7 @@ mapa_datos <- mapa_mundo %>%
 # Mapa georreferenciado
 ggplot(mapa_datos) +
   geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
-  scale_fill_viridis_c(option = "cividis", na.value = "lightgray",
+  scale_fill_viridis_c(option = "inferno", na.value = "lightgray",
                        name = "% poblacion 65+") +
   theme_minimal() +
   labs(
@@ -140,3 +142,5 @@ ggplot(mapa_datos) +
     legend.position = "right"
   )
 ```
+
+_NOTA: En el mapa georreferenciado, los países que no cuentan con información disponible para el año x respecto al indicador son representados en color gris claro. Esta codificación visual permite distinguir claramente entre los países con datos válidos (representados con un degradado de color según su valor) y aquellos sin cobertura para dicho año, facilitando la interpretación de la distribución geográfica de la información y resaltando vacíos en la base de datos del Banco Mundial._
