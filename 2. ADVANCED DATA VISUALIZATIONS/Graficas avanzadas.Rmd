@@ -42,13 +42,13 @@ data <- read.csv("C:\\Users\\mauva\\OneDrive\\Documents\\ITAM\\10mo Semestre\\VI
 #head(data)
 ```
 
-En este proyecto, nos enfocaremos en el desarrollo de una interfaz gráfica interactiva que permita a los usuarios visualizar mapas georreferenciados de diversos indicadores socioeconómicos y ambientales proporcionados por el Banco Mundial a lo largo del tiempo. Esta herramienta busca facilitar la exploración visual de patrones regionales y temporales en indicadores clave, tales como tasa de fertilidad, emisiones de CO2, acceso a educación, entre otros.
+En este proyecto, nos enfocaremos en el desarrollo de una interfaz gráfica interactiva que permita a los usuarios visualizar mapas georreferenciados de diversos indicadores socioeconómicos y ambientales proporcionados por el Banco Mundial a lo largo del tiempo. Esta herramienta busca facilitar la exploración visual de patrones regionales y temporales en indicadores, tales como tasa de fertilidad, emisiones de CO2, acceso a educación, entre otros.
 
 Para asegurar que la información presentada sea útil, relevante y precisa, se implementarán varios procesos de limpieza y transformación de datos. Entre estos procesos se incluyen:
 
 1. La reorganización estructural del conjunto de datos original del World Bank, el cual se presenta en formato ancho, a un formato largo y analíticamente más útil.
 
-2. La filtración de entidades geográficas que no corresponden a países soberanos (por ejemplo, regiones, clasificaciones de ingreso, agrupaciones económicas), manteniendo únicamente datos de países.
+2. La filtración de entidades geográficas que no corresponden a países (por ejemplo, regiones, clasificaciones de ingreso, agrupaciones económicas), manteniendo únicamente datos de países.
 
 3. El cálculo de completitud por indicador para identificar aquellos con mayor cobertura temporal y espacial, priorizando su inclusión en la interfaz.
 
@@ -147,4 +147,4 @@ ggplot(mapa_datos) +
   )
 ```
 
-_NOTA: En el mapa georreferenciado, los países que no cuentan con información disponible para el año x respecto al indicador son representados en color gris claro. Esta codificación visual permite distinguir claramente entre los países con datos válidos (representados con un degradado de color según su valor) y aquellos sin cobertura para dicho año, facilitando la interpretación de la distribución geográfica de la información y resaltando vacíos en la base de datos del Banco Mundial._
+_NOTA: En los mapaa georreferenciado, los países que no cuentan con información disponible para el año x respecto al indicador son representados en color gris claro. Esta codificación visual permite distinguir entre los países con datos válidos (representados con un degradado de color según su valor) y aquellos sin dato para dicho año, facilitando la interpretación de la distribución geográfica de la información y resaltando vacíos en la base de datos del Banco Mundial._
