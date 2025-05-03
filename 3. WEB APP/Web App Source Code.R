@@ -14,6 +14,7 @@ library(rnaturalearthdata)
 library(ggthemes)
 library(viridis)
 library(bslib) 
+library(bsicons)
 
 
 "
@@ -30,19 +31,19 @@ Web App code source
 ui <- page_fluid(
   navset_tab(
     id = "tab",  # Útil si luego usas input$tab
-    nav_panel("Intrducción",
+    nav_panel(tagList(bs_icon("app-indicator"), "Introducción"),
               h2("Introducción"),
               textOutput("intro")  # Placeholder
     ),
-    nav_panel("Mundial",
+    nav_panel(tagList(bs_icon("globe"), "Mundial"),
               h2("Visualización Mundial"),
               plotOutput("fertility_map")
     ),
-    nav_panel("Por continente",
+    nav_panel(tagList(bs_icon("map"), "Por continente"),
               h2("Visualización por continente"),
               textOutput("continente_msg")  # Placeholder
     ),
-    nav_panel("Por país",
+    nav_panel(tagList(bs_icon("pin-map"), "Por país"),
               h2("Visualización por país"),
               textOutput("pais_msg")  # Placeholder
     )
