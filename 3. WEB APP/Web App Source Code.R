@@ -13,6 +13,7 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 library(ggthemes)
 library(viridis)
+library(bslib) 
 
 
 "
@@ -26,31 +27,43 @@ Web App code source
 "
 
 # UI
-ui <- fluidPage(
-  titlePanel("Tasa de fertilidad por país (2010)"),
-  mainPanel(
-    plotOutput("fertility_map")
+ui <- page_fluid(
+  navset_tab(
+    id = "tab",  # Útil si luego usas input$tab
+    nav_panel("Intrducción",
+              h2("Introducción"),
+              textOutput("intro")  # Placeholder
+    ),
+    nav_panel("Mundial",
+              h2("Visualización Mundial"),
+              plotOutput("fertility_map")
+    ),
+    nav_panel("Por continente",
+              h2("Visualización por continente"),
+              textOutput("continente_msg")  # Placeholder
+    ),
+    nav_panel("Por país",
+              h2("Visualización por país"),
+              textOutput("pais_msg")  # Placeholder
+    )
   )
 )
 
 # Server
 server <- function(input, output) {
+  
+  # Example
   output$fertility_map <- renderPlot({
-    
-    # Filtrar datos
     fertilidad_2010 <- data %>%
       filter(year == 2010,
              indicator_name == "Fertility rate, total (births per woman)") %>%
       select(country_name, country_code, value)
     
-    # Mapa base
     mapa_mundo <- ne_countries(scale = "medium", returnclass = "sf")
     
-    # Join con datos de fertilidad
     mapa_datos <- mapa_mundo %>%
       left_join(fertilidad_2010, by = c("iso_a3" = "country_code"))
     
-    # Plot
     ggplot(mapa_datos) +
       geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
       scale_fill_viridis_c(option = "viridis", na.value = "lightgray", name = "Tasa de fertilidad") +
@@ -64,7 +77,12 @@ server <- function(input, output) {
         legend.position = "right"
       )
   })
+  
+  # Placeholders para otras pestañas
+  output$intro <- renderText("Introduccion web app")
+  output$continente_msg <- renderText("Por continente.")
+  output$pais_msg <- renderText("Por país.")
 }
 
-# App execution
-shinyApp(ui = ui, server = server)
+# Execution APP
+shinyApp(ui, server)
