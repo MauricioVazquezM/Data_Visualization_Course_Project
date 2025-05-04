@@ -36,29 +36,38 @@ ui <- page_fluid(
               textOutput("intro")  # Placeholder
     ),
     nav_panel(tagList(bs_icon("globe"), "Mundial"),
-              h2("Visualización Mundial"),
-              
-              # Layout en dos columnas: izquierda (inputs), derecha (mapa)
+              h2("Indicadores \n(Mundial)"),
+              # Layout: izquierda (inputs), derecha (mapa)
               fluidRow(
-                # Columna izquierda con inputs
+                # Columna izquierda
                 column(
-                  width = 4,
-                  selectInput("indicador_mundial", "Selecciona un indicador:",
-                              choices = unique(data$indicator_name),
-                              selected = "Fertility rate, total (births per woman)"),
-                  
-                  sliderInput("anio_mundial", "Selecciona un año:",
-                              min = min(data$year, na.rm = TRUE),
-                              max = max(data$year, na.rm = TRUE),
-                              value = 2010,
-                              sep = "")
+                  width = 2,
+                  div(
+                    style = "background-color: #f0f0f0; padding: 15px; border-radius: 8px;",
+                    
+                    selectInput("indicador_mundial", "Selecciona indicador:",
+                                choices = unique(data$indicator_name),
+                                selected = "Fertility rate, total (births per woman)"),
+                    
+                    sliderInput("anio_mundial", "Selecciona año:",
+                                min = min(data$year, na.rm = TRUE),
+                                max = max(data$year, na.rm = TRUE),
+                                value = 2010,
+                                sep = "")
+                  )
                 ),
-                
-                # Columna derecha con la visualización
+                # Columna derecha 
                 column(
                   width = 8,
-                  plotOutput("fertility_map", height = "600px")  # puedes ajustar el alto si quieres
-                )
+                  fluidRow(
+                    column(width = 8,
+                           plotOutput("map", height = "600px")),
+                    column(width = 4,
+                           h4("Top 10 países"),
+                           dataTableOutput("top10_table"))
+                  )
+                ),
+                
               )
     ),
     nav_panel(tagList(bs_icon("map"), "Por continente"),
@@ -75,10 +84,11 @@ ui <- page_fluid(
 # Server
 server <- function(input, output) {
   
-  # Example
-  output$fertility_map <- renderPlot({
+  # Mapa
+  output$map <- renderPlot({
     req(input$indicador_mundial, input$anio_mundial)
     
+    # Filtrando datos
     datos_filtrados <- data %>%
       filter(year == input$anio_mundial,
              indicator_name == input$indicador_mundial) %>%
@@ -89,6 +99,7 @@ server <- function(input, output) {
     mapa_datos <- mapa_mundo %>%
       left_join(datos_filtrados, by = c("iso_a3" = "country_code"))
     
+    # Mapa de visualizacion mapa mundial
     ggplot(mapa_datos) +
       geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
       scale_fill_viridis_c(option = "viridis", na.value = "lightgray", name = input$indicador_mundial) +
@@ -101,6 +112,33 @@ server <- function(input, output) {
         plot.subtitle = element_text(size = 14, face = "bold"),
         legend.position = "right"
       )
+    
+  })
+  
+  output$top10_table <- DT::renderDataTable({
+    req(input$indicador_mundial, input$anio_mundial)
+    
+    top10 <- data %>%
+      filter(year == input$anio_mundial,
+             indicator_name == input$indicador_mundial,
+             !is.na(value)) %>%
+      arrange(desc(value)) %>%
+      select(País = country_name, Valor = value) %>%
+      slice_head(n = 10)
+    
+    DT::datatable(
+      top10,
+      options = list(
+        pageLength = 10,
+        searching = FALSE,
+        lengthChange = FALSE,
+        order = list(list(1, 'desc')),
+        dom = 'Bfrtip',
+        buttons = c('csv')
+      ),
+      rownames = FALSE,
+      extensions = 'Buttons'
+    )
   })
   
   # Placeholders para otras pestañas
