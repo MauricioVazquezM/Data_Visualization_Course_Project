@@ -38,24 +38,28 @@ ui <- page_fluid(
     nav_panel(tagList(bs_icon("globe"), "Mundial"),
               h2("Visualización Mundial"),
               
-              # Controles
+              # Layout en dos columnas: izquierda (inputs), derecha (mapa)
               fluidRow(
-                column(6,
-                       selectInput("indicador_mundial", "Selecciona un indicador:",
-                                   choices = unique(data$indicator_name),
-                                   selected = "Fertility rate, total (births per woman)")
+                # Columna izquierda con inputs
+                column(
+                  width = 4,
+                  selectInput("indicador_mundial", "Selecciona un indicador:",
+                              choices = unique(data$indicator_name),
+                              selected = "Fertility rate, total (births per woman)"),
+                  
+                  sliderInput("anio_mundial", "Selecciona un año:",
+                              min = min(data$year, na.rm = TRUE),
+                              max = max(data$year, na.rm = TRUE),
+                              value = 2010,
+                              sep = "")
                 ),
-                column(6,
-                       sliderInput("anio_mundial", "Selecciona un año:",
-                                   min = min(data$year, na.rm = TRUE),
-                                   max = max(data$year, na.rm = TRUE),
-                                   value = 2010,
-                                   sep = "")  # elimina el separador de miles
+                
+                # Columna derecha con la visualización
+                column(
+                  width = 8,
+                  plotOutput("fertility_map", height = "600px")  # puedes ajustar el alto si quieres
                 )
-              ),
-              
-              # Plot
-              plotOutput("fertility_map")
+              )
     ),
     nav_panel(tagList(bs_icon("map"), "Por continente"),
               h2("Visualización por continente"),
