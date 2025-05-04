@@ -37,6 +37,24 @@ ui <- page_fluid(
     ),
     nav_panel(tagList(bs_icon("globe"), "Mundial"),
               h2("Visualización Mundial"),
+              
+              # Controles
+              fluidRow(
+                column(6,
+                       selectInput("indicador_mundial", "Selecciona un indicador:",
+                                   choices = unique(data$indicator_name),
+                                   selected = "Fertility rate, total (births per woman)")
+                ),
+                column(6,
+                       sliderInput("anio_mundial", "Selecciona un año:",
+                                   min = min(data$year, na.rm = TRUE),
+                                   max = max(data$year, na.rm = TRUE),
+                                   value = 2010,
+                                   sep = "")  # elimina el separador de miles
+                )
+              ),
+              
+              # Plot
               plotOutput("fertility_map")
     ),
     nav_panel(tagList(bs_icon("map"), "Por continente"),
@@ -55,22 +73,24 @@ server <- function(input, output) {
   
   # Example
   output$fertility_map <- renderPlot({
-    fertilidad_2010 <- data %>%
-      filter(year == 2010,
-             indicator_name == "Fertility rate, total (births per woman)") %>%
+    req(input$indicador_mundial, input$anio_mundial)
+    
+    datos_filtrados <- data %>%
+      filter(year == input$anio_mundial,
+             indicator_name == input$indicador_mundial) %>%
       select(country_name, country_code, value)
     
     mapa_mundo <- ne_countries(scale = "medium", returnclass = "sf")
     
     mapa_datos <- mapa_mundo %>%
-      left_join(fertilidad_2010, by = c("iso_a3" = "country_code"))
+      left_join(datos_filtrados, by = c("iso_a3" = "country_code"))
     
     ggplot(mapa_datos) +
       geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
-      scale_fill_viridis_c(option = "viridis", na.value = "lightgray", name = "Tasa de fertilidad") +
+      scale_fill_viridis_c(option = "viridis", na.value = "lightgray", name = input$indicador_mundial) +
       theme_minimal() +
-      labs(title = "Tasa de fertilidad por país (2010)",
-           subtitle = "Nacimientos por mujer",
+      labs(title = paste(input$indicador_mundial, "-", input$anio_mundial),
+           subtitle = "Visualización mundial",
            caption = "Fuente: World Bank") +
       theme(
         plot.title = element_text(size = 16, face = "bold"),
