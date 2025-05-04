@@ -58,12 +58,12 @@ ui <- page_fluid(
                 ),
                 # Columna derecha 
                 column(
-                  width = 8,
+                  width = 10,
                   fluidRow(
-                    column(width = 8,
+                    column(width = 10,
                            plotOutput("map", height = "600px")),
-                    column(width = 4,
-                           h4("Top 10 países"),
+                    column(width = 2,
+                           h4("Top 50"),
                            dataTableOutput("top10_table"))
                   )
                 ),
@@ -115,6 +115,7 @@ server <- function(input, output) {
     
   })
   
+  # Tabla dinamica top 10 mundial
   output$top10_table <- DT::renderDataTable({
     req(input$indicador_mundial, input$anio_mundial)
     
@@ -123,21 +124,20 @@ server <- function(input, output) {
              indicator_name == input$indicador_mundial,
              !is.na(value)) %>%
       arrange(desc(value)) %>%
+      mutate(value = round(value, 1)) %>%
       select(País = country_name, Valor = value) %>%
-      slice_head(n = 10)
+      slice_head(n = 50)
     
     DT::datatable(
       top10,
       options = list(
         pageLength = 10,
+        dom = 'tip',
         searching = FALSE,
         lengthChange = FALSE,
-        order = list(list(1, 'desc')),
-        dom = 'Bfrtip',
-        buttons = c('csv')
+        order = list(list(1, 'desc'))
       ),
-      rownames = FALSE,
-      extensions = 'Buttons'
+      rownames = FALSE
     )
   })
   
