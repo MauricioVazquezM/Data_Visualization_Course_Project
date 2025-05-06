@@ -46,7 +46,7 @@ ui <- page_fluid(
                     style = "background-color: #f0f0f0; padding: 15px; border-radius: 8px;",
                     
                     selectInput("indicador_mundial", "Selecciona indicador:",
-                                choices = unique(data$indicator_name),
+                                choices = unique(data$indicator_name_es),
                                 selected = "Fertility rate, total (births per woman)"),
                     
                     sliderInput("anio_mundial", "Selecciona año:",
@@ -91,7 +91,7 @@ server <- function(input, output) {
     # Filtrando datos
     datos_filtrados <- data %>%
       filter(year == input$anio_mundial,
-             indicator_name == input$indicador_mundial) %>%
+             indicator_name_es == input$indicador_mundial) %>%
       select(country_name, country_code, value)
     
     mapa_mundo <- ne_countries(scale = "medium", returnclass = "sf")
@@ -121,7 +121,7 @@ server <- function(input, output) {
     
     top10 <- data %>%
       filter(year == input$anio_mundial,
-             indicator_name == input$indicador_mundial,
+             indicator_name_es == input$indicador_mundial,
              !is.na(value)) %>%
       arrange(desc(value)) %>%
       mutate(value = round(value, 1)) %>%
