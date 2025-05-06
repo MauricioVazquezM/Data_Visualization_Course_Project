@@ -36,45 +36,93 @@ ui <- page_fluid(
               textOutput("intro")  # Placeholder
     ),
     nav_panel(tagList(bs_icon("globe"), "Mundial"),
-              h2("Indicadores \n(Mundial)"),
-              # Layout: izquierda (inputs), derecha (mapa)
+              h2("Indicadores a nivel mundial", style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
+              
               fluidRow(
-                # Columna izquierda
+                # Columna izquierda: Inputs + tabla
                 column(
-                  width = 2,
+                  width = 3,
                   div(
-                    style = "background-color: #f0f0f0; padding: 15px; border-radius: 8px;",
+                    style = "background-color: #f0f0f0; padding: 20px; border-radius: 8px;",
+                    # Contenedor centrado
+                    div(
+                      style = "text-align: center;",
+                      
+                      # selectInput centrado
+                      div(style = "display: inline-block; width: 90%;",
+                          selectInput("indicador_mundial", "Selecciona indicador:",
+                                      choices = unique(data$indicator_name_es),
+                                      selected = "Fertility rate, total (births per woman)")),
+                      
+                      # sliderInput centrado
+                      div(style = "display: inline-block; width: 90%; margin-top: 10px;",
+                          sliderInput("anio_mundial", "Selecciona año:",
+                                      min = min(data$year, na.rm = TRUE),
+                                      max = max(data$year, na.rm = TRUE),
+                                      value = 2010,
+                                      sep = ""))
+                    ),
                     
-                    selectInput("indicador_mundial", "Selecciona indicador:",
-                                choices = unique(data$indicator_name_es),
-                                selected = "Fertility rate, total (births per woman)"),
-                    
-                    sliderInput("anio_mundial", "Selecciona año:",
-                                min = min(data$year, na.rm = TRUE),
-                                max = max(data$year, na.rm = TRUE),
-                                value = 2010,
-                                sep = "")
-                  )
-                ),
-                # Columna derecha 
-                column(
-                  width = 10,
-                  fluidRow(
-                    column(width = 10,
-                           plotOutput("map", height = "600px")),
-                    column(width = 2,
-                           h4("Top 50"),
-                           dataTableOutput("top10_table"))
+                    # Título y tabla debajo
+                    h4("Top 50 países"),
+                    dataTableOutput("top10_table")
                   )
                 ),
                 
+                # Columna derecha: Mapa
+                column(
+                  width = 9,
+                  plotOutput("map", height = "650px")
+                )
               )
     ),
-    nav_panel(tagList(bs_icon("map"), "Por continente"),
-              h2("Visualización por continente"),
-              textOutput("continente_msg")  # Placeholder
+    nav_panel(tagList(bs_icon("map"), "Continente"),
+              h2("Indicadores a nivel continental", style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
+              
+              fluidRow(
+                # Columna izquierda: widgets y tabla
+                column(
+                  width = 3,
+                  div(
+                    style = "background-color: #f0f0f0; padding: 20px; border-radius: 8px;",
+                    div(
+                      style = "text-align: center;",
+                      
+                      # Select continente
+                      div(style = "display: inline-block; width: 90%;",
+                          selectInput("continente_input", "Selecciona un continente:",
+                                      choices = sort(unique(na.omit(data$continent))),
+                                      selected = "Europe")),
+                      
+                      # Select indicador
+                      div(style = "display: inline-block; width: 90%; margin-top: 10px;",
+                          selectInput("indicador_cont", "Selecciona indicador:",
+                                      choices = unique(data$indicator_name_es),
+                                      selected = "Tasa de fertilidad, total (nacimientos por mujer)")),
+                      
+                      # Slider de año
+                      div(style = "display: inline-block; width: 90%; margin-top: 10px;",
+                          sliderInput("anio_cont", "Selecciona año:",
+                                      min = min(data$year, na.rm = TRUE),
+                                      max = max(data$year, na.rm = TRUE),
+                                      value = 2010,
+                                      sep = ""))
+                    ),
+                    
+                    # Tabla debajo
+                    h4("Top 15 países"),
+                    dataTableOutput("top_cont_table")
+                  )
+                ),
+                
+                # Columna derecha: mapa
+                column(
+                  width = 9,
+                  plotOutput("continent_map", height = "650px")
+                )
+              )
     ),
-    nav_panel(tagList(bs_icon("pin-map"), "Por país"),
+    nav_panel(tagList(bs_icon("pin-map"), "País"),
               h2("Visualización por país"),
               textOutput("pais_msg")  # Placeholder
     )
@@ -141,9 +189,69 @@ server <- function(input, output) {
     )
   })
   
+  # Mapa nivel continente
+  output$continent_map <- renderPlot({
+    req(input$continente_input, input$indicador_cont, input$anio_cont)
+    
+    datos_cont <- data %>%
+      filter(year == input$anio_cont,
+             continent == input$continente_input,
+             indicator_name_es == input$indicador_cont,
+             !is.na(value)) %>%
+      select(country_name, country_code, value)
+    
+    mapa_cont <- ne_countries(scale = "medium", returnclass = "sf") %>%
+      filter(continent == input$continente_input)
+    
+    mapa_datos_cont <- mapa_cont %>%
+      left_join(datos_cont, by = c("iso_a3" = "country_code"))
+    
+    ggplot(mapa_datos_cont) +
+      geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
+      scale_fill_viridis_c(option = "magma", na.value = "lightgray", name = input$indicador_cont) +
+      theme_minimal() +
+      labs(title = paste(input$indicador_cont, "-", input$anio_cont),
+           subtitle = input$continente_input,
+           caption = "Fuente: World Bank") +
+      theme(
+        plot.title = element_text(size = 16, face = "bold"),
+        plot.subtitle = element_text(size = 14),
+        legend.position = "right"
+      )
+  })
+  
+  # tabla continente
+  output$top_cont_table <- DT::renderDataTable({
+    req(input$continente_input, input$indicador_cont, input$anio_cont)
+    
+    top50_cont <- data %>%
+      filter(year == input$anio_cont,
+             continent == input$continente_input,
+             indicator_name_es == input$indicador_cont,
+             !is.na(value)) %>%
+      arrange(desc(value)) %>%
+      mutate(value = round(value, 1)) %>%
+      select(País = country_name, Valor = value) %>%
+      slice_head(n = 15)
+    
+    DT::datatable(
+      top50_cont,
+      options = list(
+        pageLength = 10,
+        dom = 'tip',
+        searching = FALSE,
+        lengthChange = FALSE,
+        order = list(list(1, 'desc'))
+      ),
+      rownames = FALSE
+    )
+  })
+  
+  
+  
   # Placeholders para otras pestañas
   output$intro <- renderText("Introduccion web app")
-  output$continente_msg <- renderText("Por continente.")
+  # output$continente_msg <- renderText("Por continente.")
   output$pais_msg <- renderText("Por país.")
 }
 
