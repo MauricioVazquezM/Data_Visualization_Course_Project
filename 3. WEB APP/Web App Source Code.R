@@ -32,7 +32,7 @@ ui <- page_fluid(
   navset_tab(
     id = "tab",  # Útil si luego usas input$tab
     nav_panel(tagList(bs_icon("app-indicator"), "Introducción"),
-              h2("Introducción"),
+              h2("Introducción", style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
               textOutput("intro")  # Placeholder
     ),
     nav_panel(tagList(bs_icon("globe"), "Mundial"),
