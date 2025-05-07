@@ -75,9 +75,9 @@ ui <- page_fluid(
                   width = 9,
                   div(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
-                    plotOutput("map", height = "650px"),
-                    br(),
-                    h4("Mapa interactivo (Leaflet)"),
+                    # plotOutput("map", height = "650px"),
+                    # br(),
+                    h4("Mapa interactivo"),
                     leafletOutput("leaflet_map", height = "600px")
                   )
                 )
@@ -127,7 +127,10 @@ ui <- page_fluid(
                   width = 9,
                   div(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
-                    plotOutput("continent_map", height = "650px")
+                    # plotOutput("continent_map", height = "650px"),
+                    # br(),
+                    h4("Mapa interactivo"),
+                    leafletOutput("leaflet_continent_map", height = "600px")
                   )
                 )
               )
@@ -301,6 +304,48 @@ server <- function(input, output) {
       rownames = FALSE
     )
   })
+  
+  # Leaflet continent map
+  output$leaflet_continent_map <- renderLeaflet({
+    req(input$continente_input, input$indicador_cont, input$anio_cont)
+    
+    datos_leaflet <- data %>%
+      filter(year == input$anio_cont,
+             continent == input$continente_input,
+             indicator_name_es == input$indicador_cont,
+             !is.na(value)) %>%
+      select(country_name, country_code, value)
+    
+    mapa_cont <- ne_countries(scale = "medium", returnclass = "sf") %>%
+      filter(continent == input$continente_input)
+    
+    mapa_datos_leaflet <- mapa_cont %>%
+      left_join(datos_leaflet, by = c("iso_a3" = "country_code"))
+    
+    pal <- colorNumeric("viridis", domain = mapa_datos_leaflet$value, na.color = "#f2f2f2")
+    
+    leaflet(mapa_datos_leaflet) %>%
+      addProviderTiles("CartoDB.Positron") %>%
+      addPolygons(
+        fillColor = ~pal(value),
+        weight = 1,
+        opacity = 1,
+        color = "white",
+        dashArray = "3",
+        fillOpacity = 0.8,
+        label = ~paste0(country_name, ": ", round(value, 1)),
+        highlightOptions = highlightOptions(
+          weight = 3,
+          color = "#666",
+          fillOpacity = 0.9,
+          bringToFront = TRUE
+        )
+      ) %>%
+      addLegend("bottomright", pal = pal, values = ~value,
+                title = input$indicador_cont,
+                opacity = 1)
+  })
+  
   
   
   
