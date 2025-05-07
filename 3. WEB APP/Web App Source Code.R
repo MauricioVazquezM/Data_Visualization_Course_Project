@@ -72,7 +72,10 @@ ui <- page_fluid(
                 # Columna derecha: Mapa
                 column(
                   width = 9,
-                  plotOutput("map", height = "650px")
+                  div(
+                    style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
+                    plotOutput("map", height = "650px")
+                  )
                 )
               )
     ),
@@ -118,7 +121,10 @@ ui <- page_fluid(
                 # Columna derecha: mapa
                 column(
                   width = 9,
-                  plotOutput("continent_map", height = "650px")
+                  div(
+                    style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
+                    plotOutput("continent_map", height = "650px")
+                  )
                 )
               )
     ),
