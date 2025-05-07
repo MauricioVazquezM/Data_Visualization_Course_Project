@@ -15,6 +15,7 @@ library(ggthemes)
 library(viridis)
 library(bslib) 
 library(bsicons)
+library(leaflet)
 
 
 "
@@ -74,7 +75,10 @@ ui <- page_fluid(
                   width = 9,
                   div(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
-                    plotOutput("map", height = "650px")
+                    plotOutput("map", height = "650px"),
+                    br(),
+                    h4("Mapa interactivo (Leaflet)"),
+                    leafletOutput("leaflet_map", height = "600px")
                   )
                 )
               )
@@ -168,6 +172,51 @@ server <- function(input, output) {
       )
     
   })
+  
+  # Leaflet mundial map
+  output$leaflet_map <- renderLeaflet({
+    req(input$indicador_mundial, input$anio_mundial)
+    
+    # Filtrar y preparar datos
+    datos_leaflet <- data %>%
+      filter(year == input$anio_mundial,
+             indicator_name_es == input$indicador_mundial,
+             !is.na(value)) %>%
+      select(country_name, country_code, value)
+    
+    # Cargar geometrías con coordenadas
+    mapa_mundo <- ne_countries(scale = "medium", returnclass = "sf")
+    
+    # Unir geometría con datos
+    mapa_datos <- mapa_mundo %>%
+      left_join(datos_leaflet, by = c("iso_a3" = "country_code"))
+    
+    # Crear paleta de colores
+    pal <- colorNumeric("viridis", domain = mapa_datos$value, na.color = "#f2f2f2")
+    
+    # Crear mapa interactivo
+    leaflet(mapa_datos) %>%
+      addProviderTiles("CartoDB.Positron") %>%
+      addPolygons(
+        fillColor = ~pal(value),
+        weight = 1,
+        opacity = 1,
+        color = "white",
+        dashArray = "3",
+        fillOpacity = 0.8,
+        label = ~paste0(country_name, ": ", round(value, 1)),
+        highlightOptions = highlightOptions(
+          weight = 3,
+          color = "#666",
+          fillOpacity = 0.9,
+          bringToFront = TRUE
+        )
+      ) %>%
+      addLegend("bottomright", pal = pal, values = ~value,
+                title = input$indicador_mundial,
+                opacity = 1)
+  })
+  
   
   # Tabla dinamica top 10 mundial
   output$top10_table <- DT::renderDataTable({
