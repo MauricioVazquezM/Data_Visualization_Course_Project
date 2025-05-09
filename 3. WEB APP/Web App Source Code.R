@@ -61,6 +61,7 @@ ui <- page_fluid(
                                       min = min(data$year, na.rm = TRUE),
                                       max = max(data$year, na.rm = TRUE),
                                       value = 2010,
+                                      step=1,
                                       sep = ""))
                     ),
                     
@@ -113,6 +114,7 @@ ui <- page_fluid(
                                       min = min(data$year, na.rm = TRUE),
                                       max = max(data$year, na.rm = TRUE),
                                       value = 2010,
+                                      step=1,
                                       sep = ""))
                     ),
                     
@@ -134,10 +136,6 @@ ui <- page_fluid(
                   )
                 )
               )
-    ),
-    nav_panel(tagList(bs_icon("pin-map"), "País"),
-              h2("Visualización por país"),
-              textOutput("pais_msg")  # Placeholder
     )
   )
 )
@@ -180,14 +178,14 @@ server <- function(input, output) {
   output$leaflet_map <- renderLeaflet({
     req(input$indicador_mundial, input$anio_mundial)
     
-    # Filtrar y preparar datos
+    # Filtrar datos
     datos_leaflet <- data %>%
       filter(year == input$anio_mundial,
              indicator_name_es == input$indicador_mundial,
              !is.na(value)) %>%
       select(country_name, country_code, value)
     
-    # Cargar geometrías con coordenadas
+    # Coordenadas
     mapa_mundo <- ne_countries(scale = "medium", returnclass = "sf")
     
     # Unir geometría con datos
@@ -197,8 +195,8 @@ server <- function(input, output) {
     # Crear paleta de colores
     pal <- colorNumeric("viridis", domain = mapa_datos$value, na.color = "#f2f2f2")
     
-    # Crear mapa interactivo
-    leaflet(mapa_datos) %>%
+    # Mapa interactivo mundial
+    leaflet(mapa_datos, options = leafletOptions(worldCopyJump = FALSE)) %>%
       addProviderTiles("CartoDB.Positron") %>%
       addPolygons(
         fillColor = ~pal(value),
@@ -220,8 +218,7 @@ server <- function(input, output) {
                 opacity = 1)
   })
   
-  
-  # Tabla dinamica top 10 mundial
+  # Tabla dinamica mundial
   output$top10_table <- DT::renderDataTable({
     req(input$indicador_mundial, input$anio_mundial)
     
@@ -278,7 +275,7 @@ server <- function(input, output) {
       )
   })
   
-  # tabla continente
+  # Tabla continente
   output$top_cont_table <- DT::renderDataTable({
     req(input$continente_input, input$indicador_cont, input$anio_cont)
     
@@ -351,8 +348,8 @@ server <- function(input, output) {
   
   # Placeholders para otras pestañas
   output$intro <- renderText("Introduccion web app")
-  # output$continente_msg <- renderText("Por continente.")
-  output$pais_msg <- renderText("Por país.")
+  
+  
 }
 
 # Execution APP
