@@ -62,7 +62,17 @@ ui <- page_fluid(
                                       max = max(data$year, na.rm = TRUE),
                                       value = 2010,
                                       step=1,
-                                      sep = ""))
+                                      sep = "")),
+                      div(style = "display: inline-block; width: 90%;",
+                          selectInput(
+                            inputId = "palette_choice",
+                            label = "Selecciona paleta de colores:",
+                            choices = c("viridis", "plasma", "magma", "inferno", "YlGnBu", "RdYlBu", "Greens", "Blues"),
+                            selected = "Blues",
+                            selectize = TRUE
+                        )
+                      )
+                      
                     ),
                     
                     # Título y tabla debajo
@@ -191,7 +201,9 @@ server <- function(input, output) {
       left_join(datos_leaflet, by = c("iso_a3" = "country_code"))
     
     # Crear paleta de colores
-    pal <- colorNumeric("viridis", domain = mapa_datos$value, na.color = "lightgray")
+    pal <- colorNumeric(input$palette_choice, 
+                        domain = mapa_datos$value, 
+                        na.color = "lightgray")
     
     # Mapa interactivo mundial
     leaflet(mapa_datos, options = leafletOptions(worldCopyJump = FALSE)) %>%
