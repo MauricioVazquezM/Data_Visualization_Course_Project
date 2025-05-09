@@ -76,7 +76,7 @@ ui <- page_fluid(
                   width = 9,
                   div(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
-                    textOutput("leaflet_titulo", container = h4),  # ✅ título dinámico
+                    uiOutput("leaflet_titulo"),
                     leafletOutput("leaflet_map", height = "600px")
                   )
                 )
@@ -250,10 +250,15 @@ server <- function(input, output) {
   })
   
   # Titulo dinamico leaflet
-  output$leaflet_titulo <- renderText({
+  output$leaflet_titulo <- renderUI({
     req(input$indicador_mundial)
-    paste("Mapa interactivo:", input$indicador_mundial)
+    
+    # Insertar salto de línea antes del primer paréntesis
+    indicador_mod <- sub("\\(", "<br>(", input$indicador_mundial)
+    
+    HTML(paste0("<h4 style='font-weight: bold;'>Mapa interactivo: ", indicador_mod, "</h4>"))
   })
+  
   
   # Mapa nivel continente
   output$continent_map <- renderPlot({
