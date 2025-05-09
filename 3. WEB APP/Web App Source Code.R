@@ -76,9 +76,7 @@ ui <- page_fluid(
                   width = 9,
                   div(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
-                    # plotOutput("map", height = "650px"),
-                    # br(),
-                    h4("Mapa interactivo"),
+                    textOutput("leaflet_titulo", container = h4),  # ✅ título dinámico
                     leafletOutput("leaflet_map", height = "600px")
                   )
                 )
@@ -193,10 +191,11 @@ server <- function(input, output) {
       left_join(datos_leaflet, by = c("iso_a3" = "country_code"))
     
     # Crear paleta de colores
-    pal <- colorNumeric("viridis", domain = mapa_datos$value, na.color = "#f2f2f2")
+    pal <- colorNumeric("viridis", domain = mapa_datos$value, na.color = "lightgray")
     
     # Mapa interactivo mundial
     leaflet(mapa_datos, options = leafletOptions(worldCopyJump = FALSE)) %>%
+      setView(lng = -20, lat = 20, zoom = 2.5) %>% 
       addProviderTiles("CartoDB.Positron") %>%
       addPolygons(
         fillColor = ~pal(value),
@@ -213,9 +212,15 @@ server <- function(input, output) {
           bringToFront = TRUE
         )
       ) %>%
-      addLegend("bottomright", pal = pal, values = ~value,
-                title = input$indicador_mundial,
-                opacity = 1)
+      addLegend(
+        position = "bottomright",
+        pal = pal,
+        values = ~value,
+        title = "Valor del indicador",  
+        opacity = 1,
+        labFormat = labelFormat(digits = 1),
+        na.label = "Sin dato"  
+      )
   })
   
   # Tabla dinamica mundial
@@ -242,6 +247,12 @@ server <- function(input, output) {
       ),
       rownames = FALSE
     )
+  })
+  
+  # Titulo dinamico leaflet
+  output$leaflet_titulo <- renderText({
+    req(input$indicador_mundial)
+    paste("Mapa interactivo:", input$indicador_mundial)
   })
   
   # Mapa nivel continente
