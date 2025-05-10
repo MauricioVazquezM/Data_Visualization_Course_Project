@@ -49,26 +49,29 @@ ui <- page_fluid(
                 div(
                   style = "margin-top: 30px; font-size: 15px; line-height: 1.5;",
                   HTML("
+        <h4 style='font-weight: bold;'>🧭 Objetivo del proyecto</h4>
+        <p>Este proyecto tiene como objetivo desarrollar una interfaz gráfica interactiva que permita a los usuarios explorar de manera visual una serie de indicadores socioeconómicos y ambientales proporcionados por el Banco Mundial. A través de mapas georreferenciados y gráficos dinámicos, la herramienta facilita la identificación de patrones espaciales y temporales en variables como la tasa de fertilidad, las emisiones de CO₂, el acceso a la educación, entre otros indicadores clave del desarrollo.</p>
+        
         <h4 style='font-weight: bold;'>🌐 ¿Qué es el World Bank?</h4>
         <p>El Banco Mundial es una organización internacional que proporciona financiamiento, asesoramiento y asistencia técnica a países en desarrollo con el objetivo de reducir la pobreza y fomentar el desarrollo sostenible. A través de su plataforma de datos abiertos, recopila y publica indicadores económicos, sociales y ambientales que permiten evaluar y comparar el progreso de los países a lo largo del tiempo. Este panel interactivo utiliza una selección de esos indicadores para facilitar su visualización y análisis.</p>
         
         <h4 style='font-weight: bold; margin-top: 25px;'>📊 Descripción de indicadores</h4>
         <ul>
-          <li><b>Ahorro ajustado: agotamiento neto de bosques (% del INB):</b> Representa el valor económico de la pérdida de bosques en relación al ingreso nacional bruto, indicando presión sobre los recursos naturales.</li>
-          <li><b>Tierra agrícola (% del área total):</b> Porcentaje del territorio de un país utilizado para agricultura, incluyendo tierras cultivables y pastos permanentes.</li>
-          <li><b>Valor agregado por agricultura, silvicultura y pesca (% del PIB):</b> Mide la contribución directa de estas actividades al Producto Interno Bruto, sin contar los efectos indirectos o secundarios.</li>
-          <li><b>Emisiones de CO₂ (toneladas métricas per cápita):</b> Promedio de toneladas métricas de dióxido de carbono emitidas por persona en un país, derivadas principalmente del uso de combustibles fósiles.</li>
-          <li><b>Tasa de fertilidad total (nacimientos por mujer):</b> Número promedio de hijos que tendría una mujer a lo largo de su vida si se mantuvieran las tasas de natalidad actuales.</li>
-          <li><b>Índice de producción de alimentos (2004-2006 = 100):</b> Indicador del cambio en la producción de alimentos en comparación con el promedio del periodo base 2004-2006.</li>
-          <li><b>Crecimiento del PIB (anual %):</b> Tasa de variación porcentual anual del Producto Interno Bruto, que refleja el desempeño económico de un país.</li>
-          <li><b>Esperanza de vida al nacer (años):</b> Número promedio de años que se espera viva una persona desde su nacimiento, bajo las condiciones de mortalidad actuales.</li>
-          <li><b>Emisiones de metano (equivalente CO₂ per cápita):</b> Mide la cantidad de metano emitida, ajustada a su equivalente en CO2, dividida entre la población total.</li>
-          <li><b>Tasa de mortalidad menores de 5 años (por 1,000 nacidos):</b> Número de niños menores de cinco años que mueren por cada mil nacimientos vivos, indicador clave del desarrollo y salud infantil.</li>
-          <li><b>Emisiones de óxido nitroso (equivalente CO₂ per cápita):</b> Indica las emisiones de óxido nitroso convertidas a su equivalente en CO2 por persona, típicamente asociadas a la agricultura.</li>
-          <li><b>Población de 65 años o más (% del total):</b> Proporción de personas mayores de 65 años respecto a la población total, útil para entender el envejecimiento demográfico.</li>
-          <li><b>Densidad de población (personas/km²):</b> Número promedio de habitantes por kilómetro cuadrado de superficie terrestre, indicador de presión poblacional.</li>
-          <li><b>Prevalencia de sobrepeso (% de adultos):</b> Porcentaje de adultos con sobrepeso según el índice de masa corporal, relevante en temas de salud pública.</li>
-          <li><b>Matrícula escolar en primaria (% bruta):</b> Porcentaje de niños matriculados en la educación primaria respecto a la población en edad oficial de asistir, incluso si hay repitentes o fuera de rango de edad.</li>
+          <li><b>Ahorro ajustado: agotamiento neto de bosques (% del INB):</b> representa el valor económico de la pérdida de bosques en relación al ingreso nacional bruto, indicando presión sobre los recursos naturales.</li>
+          <li><b>Tierra agrícola (% del área total):</b> porcentaje del territorio de un país utilizado para agricultura, incluyendo tierras cultivables y pastos permanentes.</li>
+          <li><b>Valor agregado por agricultura, silvicultura y pesca (% del PIB):</b> mide la contribución directa de estas actividades al Producto Interno Bruto, sin contar los efectos indirectos o secundarios.</li>
+          <li><b>Emisiones de CO₂ (toneladas métricas per cápita):</b> promedio de toneladas métricas de dióxido de carbono emitidas por persona en un país, derivadas principalmente del uso de combustibles fósiles.</li>
+          <li><b>Tasa de fertilidad total (nacimientos por mujer):</b> número promedio de hijos que tendría una mujer a lo largo de su vida si se mantuvieran las tasas de natalidad actuales.</li>
+          <li><b>Índice de producción de alimentos (2004-2006 = 100):</b> indicador del cambio en la producción de alimentos en comparación con el promedio del periodo base 2004-2006.</li>
+          <li><b>Crecimiento del PIB (anual %):</b> tasa de variación porcentual anual del Producto Interno Bruto, que refleja el desempeño económico de un país.</li>
+          <li><b>Esperanza de vida al nacer (años):</b> número promedio de años que se espera viva una persona desde su nacimiento, bajo las condiciones de mortalidad actuales.</li>
+          <li><b>Emisiones de metano (equivalente CO₂ per cápita):</b> mide la cantidad de metano emitida, ajustada a su equivalente en CO2, dividida entre la población total.</li>
+          <li><b>Tasa de mortalidad menores de 5 años (por 1,000 nacidos):</b> número de niños menores de cinco años que mueren por cada mil nacimientos vivos, indicador clave del desarrollo y salud infantil.</li>
+          <li><b>Emisiones de óxido nitroso (equivalente CO₂ per cápita):</b> indica las emisiones de óxido nitroso convertidas a su equivalente en CO2 por persona, típicamente asociadas a la agricultura.</li>
+          <li><b>Población de 65 años o más (% del total):</b> proporción de personas mayores de 65 años respecto a la población total, útil para entender el envejecimiento demográfico.</li>
+          <li><b>Densidad de población (personas/km²):</b> número promedio de habitantes por kilómetro cuadrado de superficie terrestre, indicador de presión poblacional.</li>
+          <li><b>Prevalencia de sobrepeso (% de adultos):</b> porcentaje de adultos con sobrepeso según el índice de masa corporal, relevante en temas de salud pública.</li>
+          <li><b>Matrícula escolar en primaria (% bruta):</b> porcentaje de niños matriculados en la educación primaria respecto a la población en edad oficial de asistir, incluso si hay repitentes o fuera de rango de edad.</li>
         </ul>
       ")
                 )
