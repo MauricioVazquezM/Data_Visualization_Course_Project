@@ -28,14 +28,53 @@ data <- read.csv("C:\\Users\\mauva\\OneDrive\\Documents\\ITAM\\10mo Semestre\\VI
 Web App code source
 "
 
-# UI
+###### UI ######
 ui <- page_fluid(
   navset_tab(
     id = "tab",  # Útil si luego usas input$tab
-    nav_panel(tagList(bs_icon("app-indicator"), "Introducción"),
-              h2("Introducción", style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
-              textOutput("intro")  # Placeholder
-    ),
+    nav_panel(tagList(bs_icon("app-indicator"), "Inicio"),
+              h2("Indicadores del World Bank", 
+                 style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
+              
+              div(
+                style = "background-color: #f0f0f0; padding: 20px; border-radius: 8px;",
+                
+                # Logo centrado
+                div(
+                  style = "text-align: center; margin-top: 30px;",
+                  img(src = "The_World_Bank_logo.png", height = "150px")
+                ),
+                
+                # Texto descriptivo e indicadores
+                div(
+                  style = "margin-top: 30px; font-size: 15px; line-height: 1.5;",
+                  HTML("
+        <h4 style='font-weight: bold;'>🌐 ¿Qué es el World Bank?</h4>
+        <p>El Banco Mundial es una organización internacional que proporciona financiamiento, asesoramiento y asistencia técnica a países en desarrollo con el objetivo de reducir la pobreza y fomentar el desarrollo sostenible. A través de su plataforma de datos abiertos, recopila y publica indicadores económicos, sociales y ambientales que permiten evaluar y comparar el progreso de los países a lo largo del tiempo. Este panel interactivo utiliza una selección de esos indicadores para facilitar su visualización y análisis.</p>
+        
+        <h4 style='font-weight: bold; margin-top: 25px;'>📊 Descripción de indicadores</h4>
+        <ul>
+          <li><b>Ahorro ajustado: agotamiento neto de bosques (% del INB):</b> Representa el valor económico de la pérdida de bosques en relación al ingreso nacional bruto, indicando presión sobre los recursos naturales.</li>
+          <li><b>Tierra agrícola (% del área total):</b> Porcentaje del territorio de un país utilizado para agricultura, incluyendo tierras cultivables y pastos permanentes.</li>
+          <li><b>Valor agregado por agricultura, silvicultura y pesca (% del PIB):</b> Mide la contribución directa de estas actividades al Producto Interno Bruto, sin contar los efectos indirectos o secundarios.</li>
+          <li><b>Emisiones de CO₂ (toneladas métricas per cápita):</b> Promedio de toneladas métricas de dióxido de carbono emitidas por persona en un país, derivadas principalmente del uso de combustibles fósiles.</li>
+          <li><b>Tasa de fertilidad total (nacimientos por mujer):</b> Número promedio de hijos que tendría una mujer a lo largo de su vida si se mantuvieran las tasas de natalidad actuales.</li>
+          <li><b>Índice de producción de alimentos (2004-2006 = 100):</b> Indicador del cambio en la producción de alimentos en comparación con el promedio del periodo base 2004-2006.</li>
+          <li><b>Crecimiento del PIB (anual %):</b> Tasa de variación porcentual anual del Producto Interno Bruto, que refleja el desempeño económico de un país.</li>
+          <li><b>Esperanza de vida al nacer (años):</b> Número promedio de años que se espera viva una persona desde su nacimiento, bajo las condiciones de mortalidad actuales.</li>
+          <li><b>Emisiones de metano (equivalente CO₂ per cápita):</b> Mide la cantidad de metano emitida, ajustada a su equivalente en CO2, dividida entre la población total.</li>
+          <li><b>Tasa de mortalidad menores de 5 años (por 1,000 nacidos):</b> Número de niños menores de cinco años que mueren por cada mil nacimientos vivos, indicador clave del desarrollo y salud infantil.</li>
+          <li><b>Emisiones de óxido nitroso (equivalente CO₂ per cápita):</b> Indica las emisiones de óxido nitroso convertidas a su equivalente en CO2 por persona, típicamente asociadas a la agricultura.</li>
+          <li><b>Población de 65 años o más (% del total):</b> Proporción de personas mayores de 65 años respecto a la población total, útil para entender el envejecimiento demográfico.</li>
+          <li><b>Densidad de población (personas/km²):</b> Número promedio de habitantes por kilómetro cuadrado de superficie terrestre, indicador de presión poblacional.</li>
+          <li><b>Prevalencia de sobrepeso (% de adultos):</b> Porcentaje de adultos con sobrepeso según el índice de masa corporal, relevante en temas de salud pública.</li>
+          <li><b>Matrícula escolar en primaria (% bruta):</b> Porcentaje de niños matriculados en la educación primaria respecto a la población en edad oficial de asistir, incluso si hay repitentes o fuera de rango de edad.</li>
+        </ul>
+      ")
+                )
+              )
+    )
+    ,
     nav_panel(tagList(bs_icon("globe"), "Mundial"),
               h2("Indicadores a nivel mundial", style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
               
@@ -107,7 +146,6 @@ ui <- page_fluid(
     ),
     nav_panel(tagList(bs_icon("map"), "Continente"),
               h2("Indicadores a nivel continental", style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
-              
               fluidRow(
                 # Columna izquierda: widgets y tabla
                 column(
@@ -122,13 +160,11 @@ ui <- page_fluid(
                           selectInput("continente_input", "Selecciona un continente:",
                                       choices = sort(unique(na.omit(data$continent))),
                                       selected = "Europe")),
-                      
                       # Select indicador
                       div(style = "display: inline-block; width: 90%; margin-top: 10px;",
                           selectInput("indicador_cont", "Selecciona indicador:",
                                       choices = unique(data$indicator_name_es),
                                       selected = "Tasa de fertilidad, total (nacimientos por mujer)")),
-                      
                       # Slider de año
                       div(style = "display: inline-block; width: 90%; margin-top: 10px;",
                           sliderInput("anio_cont", "Selecciona año:",
@@ -138,13 +174,11 @@ ui <- page_fluid(
                                       step=1,
                                       sep = ""))
                     ),
-                    
                     # Tabla debajo
                     h4("Top 15 países"),
                     dataTableOutput("top_cont_table")
                   )
                 ),
-                
                 # Columna derecha: mapa
                 column(
                   width = 9,
@@ -161,7 +195,9 @@ ui <- page_fluid(
   )
 )
 
-# Server
+
+
+###### Server ######
 server <- function(input, output) {
   
   # Mapa
@@ -276,13 +312,11 @@ server <- function(input, output) {
   
   # Titulo dinamico leaflet
   output$leaflet_titulo <- renderUI({
-    req(input$indicador_mundial)
-    
-    # Insertar salto de línea antes del primer paréntesis
-    indicador_mod <- sub("\\(", "<br>(", input$indicador_mundial)
-    
+    req(input$indicador_mundial, input$anio_mundial)
+    indicador_mod <- sub("\\(", paste0(" en ", input$anio_mundial, "<br>("), input$indicador_mundial)
     HTML(paste0("<h4 style='font-weight: bold;'>", indicador_mod, "</h4>"))
   })
+  
   
   # Boxplot por continente
   output$boxplot <- renderPlot({
@@ -419,9 +453,6 @@ server <- function(input, output) {
                 title = input$indicador_cont,
                 opacity = 1)
   })
-  
-  
-  
   
   # Placeholders para otras pestañas
   output$intro <- renderText("Introduccion web app")
