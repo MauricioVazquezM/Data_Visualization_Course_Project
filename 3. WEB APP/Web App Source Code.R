@@ -66,13 +66,21 @@ ui <- page_fluid(
                       div(style = "display: inline-block; width: 90%;",
                           selectInput(
                             inputId = "palette_choice",
-                            label = "Selecciona paleta de colores:",
+                            label = "Selecciona paleta de colores (Mapa):",
                             choices = c("viridis", "plasma", "magma", "inferno", "YlGnBu", "RdYlBu", "Greens", "Blues"),
                             selected = "Blues",
                             selectize = TRUE
                         )
+                      ),
+                      div(style = "display: inline-block; width: 90%;",
+                          selectInput(
+                            inputId = "palette_choice_box",
+                            label = "Selecciona paleta de colores (Boxplot):",
+                            choices = c("Pastel1", "Pastel2", "Set2"),
+                            selected = "Blues",
+                            selectize = TRUE
+                          )
                       )
-                      
                     ),
                     
                     # Título y tabla debajo
@@ -87,10 +95,15 @@ ui <- page_fluid(
                   div(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
                     uiOutput("leaflet_titulo"),
-                    leafletOutput("leaflet_map", height = "600px")
+                    leafletOutput("leaflet_map", height = "600px"),
+                    # Separador
+                    tags$hr(),
+                    # Boxplot
+                    h4("Distribución por continente", style = "margin-top: 20px; font-weight: bold;"),
+                    plotOutput("boxplot", height = "400px")
                   )
                 )
-              )
+                )
     ),
     nav_panel(tagList(bs_icon("map"), "Continente"),
               h2("Indicadores a nivel continental", style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
@@ -268,11 +281,47 @@ server <- function(input, output) {
     # Insertar salto de línea antes del primer paréntesis
     indicador_mod <- sub("\\(", "<br>(", input$indicador_mundial)
     
-    HTML(paste0("<h4 style='font-weight: bold;'>Mapa interactivo: ", indicador_mod, "</h4>"))
+    HTML(paste0("<h4 style='font-weight: bold;'>", indicador_mod, "</h4>"))
+  })
+  
+  # Boxplot por continente
+  output$boxplot <- renderPlot({
+    datos_box <- data %>%
+      filter(year == input$anio_mundial,
+             indicator_name_es == input$indicador_mundial,
+             !is.na(value))
+    
+    # Calcular orden de continentes por mediana
+    orden_continentes <- datos_box %>%
+      group_by(continent) %>%
+      summarise(mediana = median(value, na.rm = TRUE)) %>%
+      arrange(desc(mediana)) %>%
+      pull(continent)
+    
+    # Convertir continente en factor con orden deseado
+    datos_box$continent <- factor(datos_box$continent, levels = orden_continentes)
+    
+    ggplot(datos_box, aes(x = continent, y = value, fill = continent)) +
+      geom_boxplot() +
+      scale_fill_brewer(palette = input$palette_choice_box)+
+      labs(x = "Continente", y = "Valor") +
+      theme_minimal(base_size = 14) +
+      theme(
+        plot.background = element_rect(fill = "#e6f2ff", color = NA),   
+        panel.background = element_rect(fill = "#e6f2ff", color = NA),  
+        legend.position = "none",
+        axis.title.x = element_text(face = "bold", size = 14),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        plot.title = element_blank()  # ✅ sin título
+      )
   })
   
   
-  # Mapa nivel continente
+  
+  
+  ##### Mapa nivel continente #####
   output$continent_map <- renderPlot({
     req(input$continente_input, input$indicador_cont, input$anio_cont)
     
