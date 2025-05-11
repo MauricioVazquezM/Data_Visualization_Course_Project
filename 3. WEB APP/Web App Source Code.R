@@ -110,7 +110,7 @@ ui <- page_fluid(
                             inputId = "palette_choice",
                             label = "Selecciona paleta de colores (Mapa):",
                             choices = c("viridis", "plasma", "magma", "inferno", "YlGnBu", "RdYlBu", "Greens", "Blues"),
-                            selected = "Blues",
+                            selected = "plasma",
                             selectize = TRUE
                         )
                       ),
@@ -162,7 +162,7 @@ ui <- page_fluid(
                       div(style = "display: inline-block; width: 90%;",
                           selectInput("continente_input", "Selecciona un continente:",
                                       choices = sort(unique(na.omit(data$continent))),
-                                      selected = "Europe")),
+                                      selected = "North America")),
                       # Select indicador
                       div(style = "display: inline-block; width: 90%; margin-top: 10px;",
                           selectInput("indicador_cont", "Selecciona indicador:",
@@ -181,7 +181,7 @@ ui <- page_fluid(
                             inputId = "palette_choice_cont",
                             label = "Selecciona paleta de colores (Mapa):",
                             choices = c("viridis", "plasma", "magma", "inferno", "YlGnBu", "RdYlBu", "Greens", "Blues"),
-                            selected = "Blues",
+                            selected = "plasma",
                             selectize = TRUE
                           )
                       )
@@ -215,36 +215,6 @@ ui <- page_fluid(
 ###### Server ######
 server <- function(input, output) {
   
-  # Mapa
-  output$map <- renderPlot({
-    req(input$indicador_mundial, input$anio_mundial)
-    
-    # Filtrando datos
-    datos_filtrados <- data %>%
-      filter(year == input$anio_mundial,
-             indicator_name_es == input$indicador_mundial) %>%
-      select(country_name, country_code, value)
-    
-    mapa_mundo <- ne_countries(scale = "medium", returnclass = "sf")
-    
-    mapa_datos <- mapa_mundo %>%
-      left_join(datos_filtrados, by = c("iso_a3" = "country_code"))
-    
-    # Mapa de visualizacion mapa mundial
-    ggplot(mapa_datos) +
-      geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
-      scale_fill_viridis_c(option = "viridis", na.value = "lightgray", name = input$indicador_mundial) +
-      theme_minimal() +
-      labs(title = paste(input$indicador_mundial, "-", input$anio_mundial),
-           subtitle = "Visualización mundial",
-           caption = "Fuente: World Bank") +
-      theme(
-        plot.title = element_text(size = 16, face = "bold"),
-        plot.subtitle = element_text(size = 14, face = "bold"),
-        legend.position = "right"
-      )
-    
-  })
   
   # Leaflet mundial map
   output$leaflet_map <- renderLeaflet({
@@ -368,39 +338,7 @@ server <- function(input, output) {
   })
   
   
-  
-  
   ##### Mapa nivel continente #####
-  output$continent_map <- renderPlot({
-    req(input$continente_input, input$indicador_cont, input$anio_cont)
-    
-    datos_cont <- data %>%
-      filter(year == input$anio_cont,
-             continent == input$continente_input,
-             indicator_name_es == input$indicador_cont,
-             !is.na(value)) %>%
-      select(country_name, country_code, value)
-    
-    mapa_cont <- ne_countries(scale = "medium", returnclass = "sf") %>%
-      filter(continent == input$continente_input)
-    
-    mapa_datos_cont <- mapa_cont %>%
-      left_join(datos_cont, by = c("iso_a3" = "country_code"))
-    
-    ggplot(mapa_datos_cont) +
-      geom_sf(aes(fill = value), color = "gray70", size = 0.2) +
-      scale_fill_viridis_c(option = "magma", na.value = "lightgray", name = input$indicador_cont) +
-      theme_minimal() +
-      labs(title = paste(input$indicador_cont, "-", input$anio_cont),
-           subtitle = input$continente_input,
-           caption = "Fuente: World Bank") +
-      theme(
-        plot.title = element_text(size = 16, face = "bold"),
-        plot.subtitle = element_text(size = 14),
-        legend.position = "right"
-      )
-  })
-  
   # Tabla continente
   output$top_cont_table <- DT::renderDataTable({
     req(input$continente_input, input$indicador_cont, input$anio_cont)
