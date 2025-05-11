@@ -381,12 +381,15 @@ server <- function(input, output) {
       filter(continent == input$continente_input)
     
     mapa_datos_leaflet <- mapa_cont %>%
-      left_join(datos_leaflet, by = c("iso_a3" = "country_code"))
+      left_join(datos_leaflet, by = c("iso_a3" = "country_code")) 
     
-    pal <- colorNumeric(input$palette_choice_cont, domain = mapa_datos_leaflet$value, na.color = "#f2f2f2")
+    pal <- colorNumeric(input$palette_choice_cont, 
+                        domain = mapa_datos_leaflet$value, 
+                        na.color = "#f2f2f2")
     
     leaflet(mapa_datos_leaflet) %>%
       addProviderTiles("CartoDB.Positron") %>%
+      setView(lng = -100, lat = 40, zoom = 2.5) %>% 
       addPolygons(
         fillColor = ~pal(value),
         weight = 1,
@@ -402,8 +405,11 @@ server <- function(input, output) {
           bringToFront = TRUE
         )
       ) %>%
-      addLegend("bottomright", pal = pal, values = ~value,
-                title = input$indicador_cont,
+      addLegend("bottomright", 
+                pal = pal, 
+                values = ~value,
+                title = "Valor del indicador",
+                na.label = "Sin dato",
                 opacity = 1)
   })
   
