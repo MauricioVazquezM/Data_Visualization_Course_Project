@@ -175,7 +175,16 @@ ui <- page_fluid(
                                       max = max(data$year, na.rm = TRUE),
                                       value = 2010,
                                       step=1,
-                                      sep = ""))
+                                      sep = "")),
+                      div(style = "display: inline-block; width: 90%;",
+                          selectInput(
+                            inputId = "palette_choice_cont",
+                            label = "Selecciona paleta de colores (Mapa):",
+                            choices = c("viridis", "plasma", "magma", "inferno", "YlGnBu", "RdYlBu", "Greens", "Blues"),
+                            selected = "Blues",
+                            selectize = TRUE
+                          )
+                      )
                     ),
                     # Tabla debajo
                     h4("Top 15 países"),
@@ -187,10 +196,13 @@ ui <- page_fluid(
                   width = 9,
                   div(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
-                    # plotOutput("continent_map", height = "650px"),
-                    # br(),
-                    h4("Mapa interactivo"),
-                    leafletOutput("leaflet_continent_map", height = "600px")
+                    uiOutput("leaflet_titulo_cont"),
+                    leafletOutput("leaflet_continent_map", height = "600px"),
+                    # Separador
+                    tags$hr(),
+                    # Boxplot
+                    # h4("Distribución por continente", style = "margin-top: 20px; font-weight: bold;"),
+                    # plotOutput("boxplot", height = "400px")
                   )
                 )
               )
@@ -433,7 +445,7 @@ server <- function(input, output) {
     mapa_datos_leaflet <- mapa_cont %>%
       left_join(datos_leaflet, by = c("iso_a3" = "country_code"))
     
-    pal <- colorNumeric("viridis", domain = mapa_datos_leaflet$value, na.color = "#f2f2f2")
+    pal <- colorNumeric(input$palette_choice_cont, domain = mapa_datos_leaflet$value, na.color = "#f2f2f2")
     
     leaflet(mapa_datos_leaflet) %>%
       addProviderTiles("CartoDB.Positron") %>%
@@ -457,9 +469,16 @@ server <- function(input, output) {
                 opacity = 1)
   })
   
+  # Titulo dinamico leaflet
+  output$leaflet_titulo_cont <- renderUI({
+    req(input$indicador_cont, input$anio_cont)
+    indicador_mod <- sub("\\(", paste0(" en ", input$anio_cont, "<br>("), input$indicador_cont)
+    HTML(paste0("<h4 style='font-weight: bold;'>", indicador_mod, "</h4>"))
+  })
+  
+  
   # Placeholders para otras pestañas
   output$intro <- renderText("Introduccion web app")
-  
   
 }
 
