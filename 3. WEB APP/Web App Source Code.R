@@ -95,7 +95,7 @@ ui <- page_fluid(
                       div(style = "display: inline-block; width: 90%;",
                           selectInput("indicador_mundial", "Selecciona indicador:",
                                       choices = unique(data$indicator_name_es),
-                                      selected = "Fertility rate, total (births per woman)")),
+                                      selected = "Tasa de fertilidad total (nacimientos por mujer)")),
                       
                       # sliderInput centrado
                       div(style = "display: inline-block; width: 90%; margin-top: 10px;",
@@ -184,7 +184,17 @@ ui <- page_fluid(
                             selected = "plasma",
                             selectize = TRUE
                           )
+                      ),
+                      div(style = "display: inline-block; width: 90%;",
+                          selectInput(
+                            inputId = "color_choice_box",
+                            label = "Selecciona color (gráfico de barras):",
+                            choices = c("blue", "green", "yellow", "purple"),
+                            selected = "blue",
+                            selectize = TRUE
+                          )
                       )
+                      
                     ),
                     # Tabla debajo
                     h4("Top 15 países"),
@@ -201,8 +211,8 @@ ui <- page_fluid(
                     # Separador
                     tags$hr(),
                     # Boxplot
-                    # h4("Distribución por continente", style = "margin-top: 20px; font-weight: bold;"),
-                    # plotOutput("boxplot", height = "400px")
+                    h4("Comparación entre países (Top 10)", style = "margin-top: 20px; font-weight: bold;"),
+                    plotOutput("continent_barplot", height = "400px")
                   )
                 )
               )
@@ -419,6 +429,34 @@ server <- function(input, output) {
     indicador_mod <- sub("\\(", paste0(" en ", input$anio_cont, "<br>("), input$indicador_cont)
     HTML(paste0("<h4 style='font-weight: bold;'>", indicador_mod, "</h4>"))
   })
+  
+  # Barplot para pestala de continente
+  output$continent_barplot <- renderPlot({
+    req(input$continente_input, input$indicador_cont, input$anio_cont)
+    
+    datos_bar <- data %>%
+      filter(year == input$anio_cont,
+             continent == input$continente_input,
+             indicator_name_es == input$indicador_cont,
+             !is.na(value)) %>%
+      select(country_name, value) %>%
+      arrange(desc(value)) %>%
+      slice_head(n = 10)
+    
+    ggplot(datos_bar, aes(x = reorder(country_name, value), y = value)) +
+      geom_bar(stat = "identity", fill = input$color_choice_box) +  
+      coord_flip() +
+      labs(x = "País", y = "Valor del indicador") +
+      theme_minimal(base_size = 14) +
+      theme(
+        plot.background = element_rect(fill = "#e6f2ff", color = NA),
+        panel.background = element_rect(fill = "#e6f2ff", color = NA),
+        axis.title.x = element_text(face = "bold", size = 14),
+        axis.title.y = element_text(face = "bold", size = 14),
+        axis.text = element_text(size = 12)
+      )
+  })
+  
   
   
   # Placeholders para otras pestañas
