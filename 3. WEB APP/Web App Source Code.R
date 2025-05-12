@@ -109,8 +109,17 @@ ui <- page_fluid(
                           selectInput(
                             inputId = "palette_choice",
                             label = "Selecciona paleta de colores (Mapa):",
-                            choices = c("viridis", "plasma", "magma", "inferno", "YlGnBu", "RdYlBu", "Greens", "Blues"),
-                            selected = "plasma",
+                            choices = c(
+                              "Viridis (verde-amarillo-azul)" = "viridis",
+                              "Plasma (rosado-amarillo-morado)" = "plasma",
+                              "Magma (negro-rojo-naranja)" = "magma",
+                              "Inferno (oscuro-rojizo)" = "inferno",
+                              "Azul-verde (YlGnBu)" = "YlGnBu",
+                              "Rojo-azul divergente (RdYlBu)" = "RdYlBu",
+                              "Verdes monocromáticos" = "Greens",
+                              "Azules monocromáticos" = "Blues"
+                            ),
+                            selected = "viridis",
                             selectize = TRUE
                         )
                       ),
@@ -118,8 +127,12 @@ ui <- page_fluid(
                           selectInput(
                             inputId = "palette_choice_box",
                             label = "Selecciona paleta de colores (Boxplot):",
-                            choices = c("Pastel1", "Pastel2", "Set2"),
-                            selected = "Blues",
+                            choices = c(
+                              "Colores pastel suaves 1" = "Pastel1",
+                              "Colores pastel suaves 2" = "Pastel2",
+                              "Colores vibrantes moderados (Set2)" = "Set2"
+                            ),
+                            selected = "Pastel2",
                             selectize = TRUE
                           )
                       )
@@ -180,7 +193,16 @@ ui <- page_fluid(
                           selectInput(
                             inputId = "palette_choice_cont",
                             label = "Selecciona paleta de colores (Mapa):",
-                            choices = c("viridis", "plasma", "magma", "inferno", "YlGnBu", "RdYlBu", "Greens", "Blues"),
+                            choices = c(
+                              "Viridis (verde-amarillo-azul)" = "viridis",
+                              "Plasma (rosado-amarillo-morado)" = "plasma",
+                              "Magma (negro-rojo-naranja)" = "magma",
+                              "Inferno (oscuro-rojizo)" = "inferno",
+                              "Azul-verde (YlGnBu)" = "YlGnBu",
+                              "Rojo-azul divergente (RdYlBu)" = "RdYlBu",
+                              "Verdes monocromáticos" = "Greens",
+                              "Azules monocromáticos" = "Blues"
+                            ),
                             selected = "plasma",
                             selectize = TRUE
                           )
@@ -189,8 +211,13 @@ ui <- page_fluid(
                           selectInput(
                             inputId = "color_choice_box",
                             label = "Selecciona color (gráfico de barras):",
-                            choices = c("blue", "green", "yellow", "purple"),
-                            selected = "blue",
+                            choices = c(
+                              "Azul suave" = "#5b8fd2",
+                              "Verde musgo" = "#7da27d",
+                              "Amarillo arena" = "#e1c36d",
+                              "Púrpura apagado" = "#a086b7"
+                            ),
+                            selected = "#5b8fd2",
                             selectize = TRUE
                           )
                       )
