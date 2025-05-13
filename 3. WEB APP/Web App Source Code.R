@@ -136,6 +136,17 @@ ui <- page_fluid(
                             selected = "Pastel2",
                             selectize = TRUE
                           )
+                      ),
+                      # Slider de velocidad de animacion
+                      div(style = "display: inline-block; width: 90%; margin-top: 10px;",
+                          sliderInput(
+                            inputId = "velocidad_anim_mun",
+                            label = "Velocidad de animación",
+                            min = 100,
+                            max = 1000,
+                            value = 200,
+                            step = 100
+                          )
                       )
                     ),
                     
@@ -160,7 +171,8 @@ ui <- page_fluid(
                     # Separador
                     tags$hr(),
                     # Animacion
-                    h4("Progresión en el tiempo", style = "margin-top: 20px; font-weight: bold;")
+                    h4("Evolución temporal por continente", style = "margin-top: 20px; font-weight: bold;"),
+                    plotlyOutput("scatter_animado_mundial", height = "400px")
                   )
                 )
                 )
@@ -230,7 +242,7 @@ ui <- page_fluid(
                       div(style = "display: inline-block; width: 90%; margin-top: 10px;",
                           sliderInput(
                             inputId = "velocidad_anim",
-                            label = "Velocidad de animación (ms por frame)",
+                            label = "Velocidad de animación",
                             min = 100,
                             max = 1000,
                             value = 200,
@@ -258,7 +270,7 @@ ui <- page_fluid(
                     # Separador
                     tags$hr(),
                     # Animacion
-                    h4("Evolución temporal del indicador", style = "margin-top: 20px; font-weight: bold;"),
+                    h4("Evolución temporal por país", style = "margin-top: 20px; font-weight: bold;"),
                     plotlyOutput("scatter_animado_cont", height = "400px")
                   )
                 )
@@ -400,6 +412,48 @@ server <- function(input, output) {
     h4(paste("Distribución por continente en", input$anio_mundial),
        style = "margin-top: 20px; font-weight: bold;")
   })
+  
+  # Animacion mundial scatterplot
+  output$scatter_animado_mundial <- renderPlotly({
+    req(input$indicador_mundial)
+    
+    datos_anim_mundial <- data %>%
+      filter(indicator_name_es == input$indicador_mundial,
+             !is.na(value),
+             !is.na(continent)) %>%
+      group_by(continent, year) %>%
+      summarise(valor = mean(value, na.rm = TRUE), .groups = "drop")
+    
+    plot_ly(
+      data = datos_anim_mundial,
+      x = ~year,
+      y = ~valor,
+      type = 'scatter',
+      mode = 'lines+markers',
+      color = ~continent,
+      # symbol = ~continent,
+      frame = ~year,
+      text = ~paste("Continente:", continent, "<br>Año:", year, "<br>Valor:", round(valor, 2)),
+      hoverinfo = "text",
+      marker = list(size = 12),
+      line = list(simplify = FALSE)
+    ) %>%
+      layout(
+        title = "",
+        xaxis = list(
+          title = list(text = "Año", font = list(family = "Arial", size = 16, color = "black"))
+        ),
+        yaxis = list(
+          title = list(text = "Valor del indicador", font = list(family = "Arial", size = 16, color = "black"))
+        ),
+        showlegend = TRUE,
+        plot_bgcolor = "#e6f2ff",
+        paper_bgcolor = "#e6f2ff"
+      ) %>%
+      animation_opts(frame = input$velocidad_anim, redraw = FALSE) %>%
+      animation_slider(currentvalue = list(prefix = "Año: "))
+  })
+  
   
   
 
@@ -549,8 +603,6 @@ server <- function(input, output) {
       mode = 'lines+markers',
       color = ~pais,
       # symbol = ~pais,  
-      #symbols = c("circle", "square", "diamond", "cross", "x", "triangle-up", 
-      #            "triangle-down", "star", "hexagram", "triangle-left"), 
       frame = ~year,
       text = ~paste("País:", pais, "<br>Año:", year, "<br>Valor:", round(valor, 2)),
       hoverinfo = "text",
@@ -559,8 +611,12 @@ server <- function(input, output) {
     ) %>%
       layout(
         title = "",
-        xaxis = list(title = "Año"),
-        yaxis = list(title = "Valor del indicador"),
+        xaxis = list(
+          title = list(text = "Año", font = list(family = "Arial", size = 16, color = "black"))
+        ),
+        yaxis = list(
+          title = list(text = "Valor del indicador", font = list(family = "Arial", size = 16, color = "black"))
+        ),
         showlegend = TRUE,
         plot_bgcolor = "#e6f2ff",
         paper_bgcolor = "#e6f2ff"
