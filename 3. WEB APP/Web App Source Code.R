@@ -225,8 +225,18 @@ ui <- page_fluid(
                             selected = "#5b8fd2",
                             selectize = TRUE
                           )
-                      )
-                      
+                      ),
+                      # Slider de velocidad de animacion
+                      div(style = "display: inline-block; width: 90%; margin-top: 10px;",
+                          sliderInput(
+                            inputId = "velocidad_anim",
+                            label = "Velocidad de animación (ms por frame)",
+                            min = 100,
+                            max = 1000,
+                            value = 200,
+                            step = 100
+                          )
+                        )
                     ),
                     # Tabla debajo
                     h4("Top 15 países"),
@@ -555,7 +565,7 @@ server <- function(input, output) {
         plot_bgcolor = "#e6f2ff",
         paper_bgcolor = "#e6f2ff"
       ) %>%
-      animation_opts(frame = 200, redraw = FALSE) %>%
+      animation_opts(frame = input$velocidad_anim, redraw = FALSE) %>%
       animation_slider(currentvalue = list(prefix = "Año: "))
   })
   
