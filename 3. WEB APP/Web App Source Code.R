@@ -16,6 +16,7 @@ library(viridis)
 library(bslib) 
 library(bsicons)
 library(leaflet)
+library(plotly)
 
 
 "
@@ -114,8 +115,8 @@ ui <- page_fluid(
                               "Plasma (rosado-amarillo-morado)" = "plasma",
                               "Magma (negro-rojo-naranja)" = "magma",
                               "Inferno (oscuro-rojizo)" = "inferno",
-                              "Azul-verde (YlGnBu)" = "YlGnBu",
-                              "Rojo-azul divergente (RdYlBu)" = "RdYlBu",
+                              "Azul-verde" = "YlGnBu",
+                              "Rojo-azul divergente" = "RdYlBu",
                               "Verdes monocromáticos" = "Greens",
                               "Azules monocromáticos" = "Blues"
                             ),
@@ -130,7 +131,7 @@ ui <- page_fluid(
                             choices = c(
                               "Colores pastel suaves 1" = "Pastel1",
                               "Colores pastel suaves 2" = "Pastel2",
-                              "Colores vibrantes moderados (Set2)" = "Set2"
+                              "Colores vibrantes moderados" = "Set2"
                             ),
                             selected = "Pastel2",
                             selectize = TRUE
@@ -154,8 +155,12 @@ ui <- page_fluid(
                     # Separador
                     tags$hr(),
                     # Boxplot
-                    h4("Distribución por continente", style = "margin-top: 20px; font-weight: bold;"),
-                    plotOutput("boxplot", height = "400px")
+                    uiOutput("boxplot_titulo"),
+                    plotOutput("boxplot", height = "400px"),
+                    # Separador
+                    tags$hr(),
+                    # Animacion
+                    h4("Progresión en el tiempo", style = "margin-top: 20px; font-weight: bold;")
                   )
                 )
                 )
@@ -198,8 +203,8 @@ ui <- page_fluid(
                               "Plasma (rosado-amarillo-morado)" = "plasma",
                               "Magma (negro-rojo-naranja)" = "magma",
                               "Inferno (oscuro-rojizo)" = "inferno",
-                              "Azul-verde (YlGnBu)" = "YlGnBu",
-                              "Rojo-azul divergente (RdYlBu)" = "RdYlBu",
+                              "Azul-verde" = "YlGnBu",
+                              "Rojo-azul divergente" = "RdYlBu",
                               "Verdes monocromáticos" = "Greens",
                               "Azules monocromáticos" = "Blues"
                             ),
@@ -238,8 +243,13 @@ ui <- page_fluid(
                     # Separador
                     tags$hr(),
                     # Boxplot
-                    h4("Comparación entre países (Top 10)", style = "margin-top: 20px; font-weight: bold;"),
-                    plotOutput("continent_barplot", height = "400px")
+                    uiOutput("barplot_titulo"),
+                    plotOutput("continent_barplot", height = "400px"),
+                    # Separador
+                    tags$hr(),
+                    # Animacion
+                    h4("Evolución temporal del indicador", style = "margin-top: 20px; font-weight: bold;"),
+                    plotlyOutput("scatter_animado_cont", height = "400px")
                   )
                 )
               )
@@ -374,7 +384,15 @@ server <- function(input, output) {
       )
   })
   
+  # Titulo para boxplots
+  output$boxplot_titulo <- renderUI({
+    req(input$anio_mundial)
+    h4(paste("Distribución por continente en", input$anio_mundial),
+       style = "margin-top: 20px; font-weight: bold;")
+  })
   
+  
+
   ##### Mapa nivel continente #####
   # Tabla continente
   output$top_cont_table <- DT::renderDataTable({
@@ -482,6 +500,63 @@ server <- function(input, output) {
         axis.title.y = element_text(face = "bold", size = 14),
         axis.text = element_text(size = 12)
       )
+  })
+  
+  # Titulo de barplot con año
+  output$barplot_titulo <- renderUI({
+    req(input$anio_cont)
+    h4(paste("Comparación entre países (Top 10) en", input$anio_cont),
+       style = "margin-top: 20px; font-weight: bold;")
+  })
+  
+  # Animación de scatterplot
+  output$scatter_animado_cont <- renderPlotly({
+    req(input$continente_input, input$indicador_cont, input$anio_cont)
+    
+    # 1. Top 10 países del año seleccionado
+    top_paises <- data %>%
+      filter(year == input$anio_cont,
+             continent == input$continente_input,
+             indicator_name_es == input$indicador_cont,
+             !is.na(value)) %>%
+      arrange(desc(value)) %>%
+      slice_head(n = 10) %>%
+      pull(country_name)
+    
+    # 2. Datos solo para esos países, en todos los años
+    datos_anim <- data %>%
+      filter(continent == input$continente_input,
+             indicator_name_es == input$indicador_cont,
+             country_name %in% top_paises,
+             !is.na(value)) %>%
+      select(pais = country_name, year, valor = value)
+    
+    plot_ly(
+      data = datos_anim,
+      x = ~year,
+      y = ~valor,
+      type = 'scatter',
+      mode = 'lines+markers',
+      color = ~pais,
+      # symbol = ~pais,  
+      #symbols = c("circle", "square", "diamond", "cross", "x", "triangle-up", 
+      #            "triangle-down", "star", "hexagram", "triangle-left"), 
+      frame = ~year,
+      text = ~paste("País:", pais, "<br>Año:", year, "<br>Valor:", round(valor, 2)),
+      hoverinfo = "text",
+      marker = list(size = 10),
+      line = list(simplify = FALSE)  
+    ) %>%
+      layout(
+        title = "",
+        xaxis = list(title = "Año"),
+        yaxis = list(title = "Valor del indicador"),
+        showlegend = TRUE,
+        plot_bgcolor = "#e6f2ff",
+        paper_bgcolor = "#e6f2ff"
+      ) %>%
+      animation_opts(frame = 200, redraw = FALSE) %>%
+      animation_slider(currentvalue = list(prefix = "Año: "))
   })
   
   
