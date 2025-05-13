@@ -172,7 +172,11 @@ ui <- page_fluid(
                     tags$hr(),
                     # Animacion
                     h4("Evolución temporal por continente", style = "margin-top: 20px; font-weight: bold;"),
-                    plotlyOutput("scatter_animado_mundial", height = "400px")
+                    plotlyOutput("scatter_animado_mundial", height = "400px"),
+                    tags$p(
+                      "🔄 Esta visualización muestra la evolución del valor promedio del indicador seleccionado por continente a lo largo del tiempo.",
+                      style = "font-size: 14px; color: #333; margin-top: 10px;"
+                    )
                   )
                 )
                 )
@@ -271,7 +275,12 @@ ui <- page_fluid(
                     tags$hr(),
                     # Animacion
                     h4("Evolución temporal por país", style = "margin-top: 20px; font-weight: bold;"),
-                    plotlyOutput("scatter_animado_cont", height = "400px")
+                    plotlyOutput("scatter_animado_cont", height = "400px"),
+                    tags$p(
+                      "🔄 Esta visualización muestra cómo ha cambiado el indicador en los 10 países con los valores más altos del continente seleccionado.",
+                      style = "font-size: 14px; color: #333; margin-top: 10px;"
+                    )
+                    
                   )
                 )
               )
