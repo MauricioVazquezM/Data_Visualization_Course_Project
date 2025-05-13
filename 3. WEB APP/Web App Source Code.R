@@ -74,11 +74,19 @@ ui <- page_fluid(
           <li><b>Prevalencia de sobrepeso (% de adultos):</b> porcentaje de adultos con sobrepeso según el índice de masa corporal, relevante en temas de salud pública.</li>
           <li><b>Matrícula escolar en primaria (% bruta):</b> porcentaje de niños matriculados en la educación primaria respecto a la población en edad oficial de asistir, incluso si hay repitentes o fuera de rango de edad.</li>
         </ul>
+        
+        <h4 style='font-weight: bold; margin-top: 25px;'>📚 Referencias</h4>
+        <ul>
+          <li>World Bank Open Data. Recuperado de <a href='https://data.worldbank.org/' target='_blank'>https://data.worldbank.org/</a></li>
+          <li>Kaggle - ESG Dataset: <a href='https://www.kaggle.com/datasets/tunguz/environment-social-and-governance-data/data?select=ESGData.csv' target='_blank'>https://www.kaggle.com/datasets/tunguz/environment-social-and-governance-data</a></li>
+          <li>R Shiny. Documentación oficial: <a href='https://shiny.posit.co/' target='_blank'>https://shiny.posit.co/</a></li>
+          <li>Plotly para R: <a href='https://plotly.com/r/' target='_blank'>https://plotly.com/r/</a></li>
+          <li>Gráficos espaciales en R: <a href='https://r-charts.com/es/espacial/mapas-interactivos-leaflet/' target='_blank'>https://r-charts.com/es/espacial/mapas-interactivos-leaflet/</a></li>
+        </ul>
       ")
                 )
               )
-    )
-    ,
+    ),
     nav_panel(tagList(bs_icon("globe"), "Mundial"),
               h2("Indicadores a nivel mundial", style = "background-color: #007acc; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"),
               
