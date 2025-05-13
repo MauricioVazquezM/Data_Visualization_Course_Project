@@ -47,7 +47,21 @@ Los datos provienen directamente del repositorio del Banco Mundial (World Develo
 
 ---
 
-## Dashboard
+## 🧭 Dashboard
+
+### Inicio
+
+![alt text](/IMAGES/image.png)
+
+### Indicadores a nivel mundial
+
+![alt text](/IMAGES/image-1.png)
+
+### Indicadores a nivel continente
+
+![alt text](/IMAGES/image-2.png)
+
+
 
 
 
