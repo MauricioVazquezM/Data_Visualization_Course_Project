@@ -134,14 +134,15 @@ ui <- page_fluid(
                       ),
                       div(style = "display: inline-block; width: 90%;",
                           selectInput(
-                            inputId = "palette_choice_box",
-                            label = "Selecciona paleta de colores (Boxplot):",
+                            inputId = "color_boxplot",
+                            label = "Selecciona color (Boxplot):",
                             choices = c(
-                              "Colores pastel suaves 1" = "Pastel1",
-                              "Colores pastel suaves 2" = "Pastel2",
-                              "Colores vibrantes moderados" = "Set2"
+                              "Azul suave" = "#5b8fd2",
+                              "Verde musgo" = "#7da27d",
+                              "Amarillo arena" = "#e1c36d",
+                              "Púrpura apagado" = "#a086b7"
                             ),
-                            selected = "Pastel2",
+                            selected = "#5b8fd2",
                             selectize = TRUE
                           )
                       ),
@@ -171,18 +172,26 @@ ui <- page_fluid(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
                     uiOutput("leaflet_titulo"),
                     leafletOutput("leaflet_map", height = "600px"),
+                    tags$p(
+                      "🔄 Mapa interactivo que muestra el valor por país por indicador y año seleccionado.",
+                      style = "font-size: 14px; color: #333; margin-top: 10px;"
+                    ),
                     # Separador
                     tags$hr(),
                     # Boxplot
                     uiOutput("boxplot_titulo"),
                     plotOutput("boxplot", height = "400px"),
+                    tags$p(
+                      "🔄 Distribución de continentes ordenados por mediana del indicador seleccionado.",
+                      style = "font-size: 14px; color: #333; margin-top: 10px;"
+                    ),
                     # Separador
                     tags$hr(),
                     # Animacion
                     h4("Evolución temporal por continente", style = "margin-top: 20px; font-weight: bold;"),
                     plotlyOutput("scatter_animado_mundial", height = "400px"),
                     tags$p(
-                      "🔄 Esta visualización muestra la evolución del valor promedio del indicador seleccionado por continente a lo largo del tiempo.",
+                      "🔄 Evolución del valor promedio del indicador seleccionado por continente a lo largo del tiempo.",
                       style = "font-size: 14px; color: #333; margin-top: 10px;"
                     )
                   )
@@ -274,11 +283,19 @@ ui <- page_fluid(
                     style = "background-color: #e6f2ff; padding: 20px; border-radius: 10px;",
                     uiOutput("leaflet_titulo_cont"),
                     leafletOutput("leaflet_continent_map", height = "600px"),
+                    tags$p(
+                      "🔄 Mapa interactivo que muestra los valores por país en el año, indicador y continente seleccionado.",
+                      style = "font-size: 14px; color: #333; margin-top: 10px;"
+                    ),
                     # Separador
                     tags$hr(),
                     # Boxplot
                     uiOutput("barplot_titulo"),
                     plotOutput("continent_barplot", height = "400px"),
+                    tags$p(
+                      "🔄 Paises del continente ordenados por valor del indicador y año seleccionado.",
+                      style = "font-size: 14px; color: #333; margin-top: 10px;"
+                    ),
                     # Separador
                     tags$hr(),
                     # Animacion
@@ -407,8 +424,7 @@ server <- function(input, output) {
     datos_box$continent <- factor(datos_box$continent, levels = orden_continentes)
     
     ggplot(datos_box, aes(x = continent, y = value, fill = continent)) +
-      geom_boxplot() +
-      scale_fill_brewer(palette = input$palette_choice_box)+
+      geom_boxplot(fill = input$color_boxplot) +
       labs(x = "Continente", y = "Valor") +
       theme_minimal(base_size = 14) +
       theme(
